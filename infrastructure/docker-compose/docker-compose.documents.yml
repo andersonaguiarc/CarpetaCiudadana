@@ -37,6 +37,14 @@ services:
     networks:
       - app-network
 
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    networks:
+      - app-network
+
   rabbitmq:
     image: rabbitmq:3.8-management-alpine
     expose:
