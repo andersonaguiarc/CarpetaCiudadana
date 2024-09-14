@@ -1,0 +1,28 @@
+---
+version: "3.8"
+services:
+  citizen_transfers:
+    build:
+      context: ../../services/external_citizen_register
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=True
+    volumes:
+      - ../../services/external_citizen_register:/app
+    command: ["python3", "src/main/external_citizen_register.py"]
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    expose:
+      - 5672
+    ports:
+      - 15672:15672
+    volumes:
+      - ./rabbitmq/config/rabbitmq-definitions.json:/etc/rabbitmq/definitions.json
+    networks:
+      - app-network
+
+networks:
+  app-network:

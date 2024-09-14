@@ -1,0 +1,77 @@
+---
+version: "3.8"
+services:
+  citizen_transfers:
+    build:
+      context: ../../services/citizen_transfer
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=True
+    volumes:
+      - ../../services/citizen_transfer:/app
+    command: ["python3", "src/main/citizen_transfers.py"]
+    networks:
+      - app-network
+
+  complete_transfer_citizen_document_worker:
+    build:
+      context: ../../services/citizen_transfer
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=True
+    volumes:
+      - ../../services/citizen_transfer:/app
+    command:
+      ["python3", "src/main/complete_transfer_citizen_document_worker.py"]
+    networks:
+      - app-network
+
+  external_citizern_worker:
+    build:
+      context: ../../services/citizen_transfer
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=True
+    volumes:
+      - ../../services/citizen_transfer:/app
+    command: ["python3", "src/main/external_citizern_worker.py"]
+    networks:
+      - app-network
+
+  transfer_citizen_documents_worker:
+    build:
+      context: ../../services/citizen_transfer
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=True
+    volumes:
+      - ../../services/citizen_transfer:/app
+    command: ["python3", "src/main/transfer_citizen_documents_worker.py"]
+    networks:
+      - app-network
+
+  transfer_citizen_worker:
+    build:
+      context: ../../services/citizen_transfer
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=True
+    volumes:
+      - ../../services/citizen_transfer:/app
+    command: ["python3", "src/main/transfer_citizen_worker.py"]
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    expose:
+      - 5672
+    ports:
+      - 15672:15672
+    volumes:
+      - ./rabbitmq/config/rabbitmq-definitions.json:/etc/rabbitmq/definitions.json
+    networks:
+      - app-network
+
+networks:
+  app-network:

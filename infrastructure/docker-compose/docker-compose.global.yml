@@ -1,0 +1,16 @@
+---
+version: "3.8"
+services:
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    expose:
+      - 5672
+    ports:
+      - 15672:15672
+    volumes:
+      - ../rabbitmq/config/rabbitmq-definitions.json:/etc/rabbitmq/definitions.json
+    networks:
+      - app-network
+
+networks:
+  app-network:
