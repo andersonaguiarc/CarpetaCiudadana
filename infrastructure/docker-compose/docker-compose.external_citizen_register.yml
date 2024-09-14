@@ -1,7 +1,7 @@
 ---
 version: "3.8"
 services:
-  citizen_transfers:
+  external_citizen_register:
     build:
       context: ../../services/external_citizen_register
       dockerfile: Dockerfile
