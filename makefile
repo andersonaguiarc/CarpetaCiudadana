@@ -13,3 +13,7 @@ citizen_transfer:
 .PHONY: documents
 documents:
 	@docker-compose -f infrastructure/docker-compose/docker-compose.documents.yml up --build
+
+.PHONY: citizen_folder
+citizen_folder:
+	@docker-compose -f infrastructure/docker-compose/docker-compose.citizen_folder.yml up --build
