@@ -54,7 +54,7 @@
             ]
         },
         {
-            "endpoint": "/registration-exp/api/users/registrations",
+            "endpoint": "/registration-exp/api/citizens/registrations",
             "input_headers": [
                 "*"
             ],
@@ -64,12 +64,12 @@
                     "host": [
                         "http://registration-exp-api"
                     ],
-                    "url_pattern": "/api/users/registrations"
+                    "url_pattern": "/api/citizens/registrations"
                 }
             ]
         },
         {
-            "endpoint": "/registration-exp/api/users/registrations",
+            "endpoint": "/registration-exp/api/citizens/registrations",
             "input_headers": [
                 "*"
             ],
@@ -79,7 +79,7 @@
                     "host": [
                         "http://registration-exp-api"
                     ],
-                    "url_pattern": "/api/users/registrations"
+                    "url_pattern": "/api/citizens/registrations"
                 }
             ]
         }
