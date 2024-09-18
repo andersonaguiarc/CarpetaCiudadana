@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: checkout-ambassador-tls
+spec:
+  commonName: checkout.ambassadors.ink
+  dnsNames:
+  - checkout.ambassadors.ink
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  secretName: checkout-ambassador-tls

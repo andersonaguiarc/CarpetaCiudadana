@@ -1,0 +1,87 @@
+{
+    "host": [
+        "api.ambassadors.ink"
+    ],
+    "client_tls": {
+        "allow_insecure_connections": true
+    },
+    "disable_rest": true,
+    "name": "KrakenD on K8s",
+    "output_encoding": "no-op",
+    "port": 8080,
+    "timeout": "3s",
+    "version": 3,
+    "extra_config": {
+        "security/cors": {
+            "allow_origins": [
+                "localhost",
+                "*"
+            ],
+            "expose_headers": [
+                "Content-Length",
+                "Content-Type"
+            ],
+            "allow_headers": [
+                "Accept-Language"
+            ],
+            "allow_methods": [
+                "DELETE",
+                "GET",
+                "HEAD",
+                "OPTIONS",
+                "PATCH",
+                "POST",
+                "PUT"
+            ],
+            "allow_credentials": true,
+            "debug": true
+        }
+    },
+    "endpoints": [
+        {
+            "endpoint": "/registration-exp/api/info",
+            "input_headers": [
+                "*"
+            ],
+            "method": "GET",
+            "backend": [
+                {
+                    "host": [
+                        "http://registration-exp-api"
+                    ],
+                    "url_pattern": "/api/info"
+                }
+            ]
+        },
+        {
+            "endpoint": "/registration-exp/api/users/registrations",
+            "input_headers": [
+                "*"
+            ],
+            "method": "POST",
+            "backend": [
+                {
+                    "host": [
+                        "http://registration-exp-api"
+                    ],
+                    "url_pattern": "/api/users/registrations"
+                }
+            ]
+        },
+        {
+            "endpoint": "/registration-exp/api/users/registrations",
+            "input_headers": [
+                "*"
+            ],
+            "method": "OPTIONS",
+            "backend": [
+                {
+                    "host": [
+                        "http://registration-exp-api"
+                    ],
+                    "url_pattern": "/api/users/registrations"
+                }
+            ]
+        }
+    ]
+}

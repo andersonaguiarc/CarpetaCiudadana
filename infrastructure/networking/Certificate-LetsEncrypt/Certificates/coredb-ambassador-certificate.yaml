@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: coredb-ambassador-tls
+spec:
+  commonName: coredb.ambassadors.ink
+  dnsNames:
+  - coredb.ambassadors.ink
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  secretName: coredb-ambassador-tls

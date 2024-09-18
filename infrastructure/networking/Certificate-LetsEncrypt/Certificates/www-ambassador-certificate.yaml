@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: www-ambassador-tls
+spec:
+  commonName: www.ambassadors.ink
+  dnsNames:
+  - www.ambassadors.ink
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  secretName: www-ambassador-tls
