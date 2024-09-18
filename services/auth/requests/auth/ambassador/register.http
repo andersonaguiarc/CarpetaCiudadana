@@ -1,0 +1,13 @@
+# * POST to create a new ambassador
+
+POST {{host}}/api/ambassador/register
+# POST https://testazure.serviciosit.co/arq/registration-exp/api/users/registrations
+content-type: application/json
+
+{
+    "email": "sara@rodriguez.com",
+    "first_name": "Sara",
+    "last_name": "Rodríguez",
+    "password": "asd123",
+    "password_confirm": "asd123"
+}

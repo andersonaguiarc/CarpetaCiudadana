@@ -1,0 +1,9 @@
+# * POST to login ambassador
+
+POST {{host}}/api/ambassador/login
+content-type: application/json
+
+{
+    "email": "sara@rodriguez.com",
+    "password": "asd123"
+}

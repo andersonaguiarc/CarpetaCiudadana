@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-api
+  namespace: citizens-folder
+data:
+  AUTH_PROVIDER_X509_CERT_URL: https://www.googleapis.com/oauth2/v1/certs
+  AUTH_URI                   : https://accounts.google.com/o/oauth2/auth
+  CLIENT_X509_CERT_URL       : https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-xtm4k%40ambassador-a7ed1.iam.gserviceaccount.com
+  CORS_ORIGINS               : localhost,*
+  FB_AUTH_DOMAIN             : citizens-folder.firebaseapp.com
+  FB_PROJECT_ID              : citizens-folder
+  FB_STORAGE_BUCKET          : citizens-folder.appspot.com
+  SERVER_PORT                : '8050'
+  TOKEN_URI                  : https://oauth2.googleapis.com/token
+  UNIVERSE_DOMAIN            : googleapis.com

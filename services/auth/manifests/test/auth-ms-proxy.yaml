@@ -1,0 +1,17 @@
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: auth-api
+  namespace: ambassador-test
+spec:
+  virtualhost:
+    fqdn: auth.ambassadors.ink
+  routes:
+    - conditions:
+      - prefix: /auth/
+      services:
+        - name: auth-api
+          port: 80
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /

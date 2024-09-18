@@ -1,0 +1,12 @@
+# * POST to create a new admin
+
+POST http://localhost:8050/api/admin/register
+content-type: application/json
+
+{
+    "first_name": "Sara",
+    "last_name": "Rodríguez",
+    "email": "s@g.com",
+    "password": "123",
+    "password_confirm": "456"
+}

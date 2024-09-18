@@ -82,6 +82,21 @@
                     "url_pattern": "/api/citizens/registrations"
                 }
             ]
+        },
+        {
+            "endpoint": "/auth/api/citizens/login",
+            "input_headers": [
+                "*"
+            ],
+            "method": "POST",
+            "backend": [
+                {
+                    "host": [
+                        "http://auth-api"
+                    ],
+                    "url_pattern": "/api/citizens/login"
+                }
+            ]
         }
     ]
 }

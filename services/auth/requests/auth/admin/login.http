@@ -1,0 +1,9 @@
+# * POST to login admin
+
+POST {{host}}/api/admin/login
+content-type: application/json
+
+{
+    "email": "q@q.com",
+    "password": "qwe789"
+}

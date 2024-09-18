@@ -1,0 +1,3 @@
+# * GET to fetch basic health check
+
+GET {{host}}/api/info
