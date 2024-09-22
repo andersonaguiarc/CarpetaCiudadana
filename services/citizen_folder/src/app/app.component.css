@@ -1,0 +1,66 @@
+/* Botones comunes */
+.primary-button, .accept-button, .change-password-button, .edit-button {
+    background-color: var(--colorBotones);
+    border: 2px solid; /* Borde */
+    border-radius: 8px;
+    color: white;
+    font-size: var(--md);
+    font-weight: bold;
+    padding: 12px 20px;
+    cursor: pointer;
+    width: 100%;  /* Los botones toman todo el ancho del contenedor */
+}
+.perfil-button, .back-button {
+    background-color: var(--colorBotones);
+    border: 2px solid var(--colorBotones); /* Borde */
+    border-radius: 8px;
+    color: white;
+    font-size: var(--md);
+    font-weight: bold;
+    padding: 12px 20px;
+    cursor: pointer;
+    width: auto;
+}
+
+
+
+.primary-button:hover, .back-button:hover, .accept-button:hover, .change-password-button:hover, .edit-button:hover {
+    background-color: #3a8ca5;
+    border-color: #3a8ca5;
+}
+
+/* Estilos globales para formularios */
+.input {
+    width: 100%;  /* Los inputs ocupan todo el ancho disponible */
+    background-color: var(--inputBg);
+    border: 1px solid #ccc;  /* Agrega un borde más definido */
+    border-radius: 8px;
+    padding: 12px;
+    font-size: var(--md);
+    margin-bottom: 10px;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 350px;
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-container label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: var(--md);
+}
+
+/* Estilo para los títulos de secciones */
+.titulo {
+    text-align: center;
+    font-size: var(--lg);
+    font-weight: bold;
+    margin-bottom: 20px;
+}
