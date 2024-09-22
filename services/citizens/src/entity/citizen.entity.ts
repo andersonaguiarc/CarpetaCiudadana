@@ -1,9 +1,12 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { USER_STATUS } from "./status.enum";
 
 @Entity()
 export class Citizen {
-    @PrimaryColumn()
+    @PrimaryColumn({
+        type: 'bigint'
+        , unique: true
+    })
     id: number;
 
     @Column()
