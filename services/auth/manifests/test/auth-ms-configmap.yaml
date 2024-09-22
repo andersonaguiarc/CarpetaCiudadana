@@ -14,3 +14,7 @@ data:
   SERVER_PORT                : '8050'
   TOKEN_URI                  : https://oauth2.googleapis.com/token
   UNIVERSE_DOMAIN            : googleapis.com
+  DELETE_USER_QUEUE_NAME: delete_user_from_auth
+  AUTH_MICROSERVICE_URL: http://auth-api
+  RABBITMQ_HOST: rabbitmq-service.rabbitmq.svc.cluster.local
+  RABBITMQ_PORT: "5672"

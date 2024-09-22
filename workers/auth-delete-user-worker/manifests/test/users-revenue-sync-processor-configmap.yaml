@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: users-revenue-sync-processor
+  namespace: ambassador-test
+data:
+  KAFKA_CLIENT_ID : users-revenue-sync-processor
+  KAFKA_CONSUMER_TOPIC : users-revenue
+  USERS_MICROSERVICE_URL: http://users-api

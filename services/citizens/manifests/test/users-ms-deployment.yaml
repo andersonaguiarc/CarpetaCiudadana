@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-api
+  namespace: citizens-folder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: users-api
+    spec:
+      containers:
+      - name: users-api
+        image: spbpatino/citizens-folder-citizens:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: users-api
+        - secretRef:
+            name: users-api
+        ports:
+        - containerPort: 8100
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /api/info
+            port: 8100
+        livenessProbe:
+          httpGet:
+            path: /api/info
+            port: 8100
+
+      #- name: users-registration-processor
+      #  image: ayalamac/arq-ambassador-users-registration-worker:v5
+      #  imagePullPolicy: Always
+      #  envFrom:
+      #  - configMapRef:
+      #      name: users-registration-processor
+      #  - secretRef:
+      #      name: users-registration-processor
+      #  resources:
+      #    requests:
+      #      cpu: "50m"
+      #      memory: "128Mi"
+      #    limits:
+      #      cpu: "500m"
+      #      memory: "512Mi"
+      #      
+      #- name: users-revenue-sync-processor
+      #  image: ayalamac/arq-ambassador-users-revenue-sync-worker:v5
+      #  imagePullPolicy: Always
+      #  envFrom:
+      #  - configMapRef:
+      #      name: users-revenue-sync-processor
+      #  - secretRef:
+      #      name: users-revenue-sync-processor
+      #  resources:
+      #    requests:
+      #      cpu: "50m"
+      #      memory: "128Mi"
+      #    limits:
+      #      cpu: "500m"
+      #      memory: "512Mi"

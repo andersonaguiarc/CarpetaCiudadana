@@ -44,3 +44,13 @@ spec:
           httpGet:
             path: /api/info
             port: 8050
+      - name: auth-delete-user-worker
+        image: spbpatino/citizens-folder-auth-delete-user:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

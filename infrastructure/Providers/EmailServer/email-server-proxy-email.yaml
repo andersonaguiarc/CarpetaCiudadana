@@ -1,0 +1,17 @@
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  labels:
+    app: email-server-mailhog
+  name: email-server-mailhog-email
+  namespace: ambassador-test
+spec:
+  virtualhost:
+    fqdn: email.ambassadors.ink
+    tls:
+      secretName: email-ambassador-tls
+  routes:
+    - conditions:
+      - prefix: /
+      requestRedirectPolicy:
+        hostname: mailhog.ambassadors.ink

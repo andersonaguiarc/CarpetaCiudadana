@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-ambassador-mysql
+  namespace: ambassador-test
+spec:
+  selector:
+    app: db-ambassador-mysql
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306

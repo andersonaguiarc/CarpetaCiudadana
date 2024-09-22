@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email-server-mailhog
+  namespace: ambassador-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: email-server-mailhog
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: email-server-mailhog
+    spec:
+      containers:
+      - name: email-server-mailhog
+        image: mailhog/mailhog
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 1025
+        - containerPort: 8025

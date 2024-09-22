@@ -1,0 +1,18 @@
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  labels:
+    app: db-users-client-myphpadmin
+  name: db-users-client-myphpadmin-coredb
+  namespace: ambassador-test
+spec:
+  virtualhost:
+    fqdn: usersdb.ambassadors.ink
+    tls:
+      secretName: usersdb-ambassador-tls
+  routes:
+    - conditions:
+      - prefix: /
+      services:
+        - name: db-users-client-myphpadmin
+          port: 80
