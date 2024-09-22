@@ -159,6 +159,38 @@
                     ]
                 }
             }
+        },
+        {
+            "endpoint": "/users/api/citizens/transfer",
+            "input_headers": [
+                "*"
+            ],
+            "method": "PATCH",
+            "backend": [
+                {
+                    "host": [
+                        "http://users-api"
+                    ],
+                    "url_pattern": "/api/citizens/transfer"
+                }
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "audience": [
+                        "citizens-folder"
+                    ],
+                    "cache": true,
+                    "cookie_key": "jwt",
+                    "issuer": "https://securetoken.google.com/citizens-folder",
+                    "jwk_url": "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com",
+                    "operation_debug": true,
+                    "roles_key": "role",
+                    "roles": [
+                        "citizen"
+                    ]
+                }
+            }
         }
     ]
 }

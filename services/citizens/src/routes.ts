@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Register, UpdateInfo, Info, AuthenticatedUser } from "./controller/user.controller";
+import { Register, UpdateInfo, Info, AuthenticatedUser, TransferCitizen } from "./controller/user.controller";
 import { UserMiddleware } from "./middleware/user.middleware";
 
 export const routes = (router: Router) => {
@@ -10,4 +10,6 @@ export const routes = (router: Router) => {
     router.post('/api/citizens/register', Register);
     router.get('/api/citizens/user', UserMiddleware, AuthenticatedUser);
     router.put('/api/citizens/users/info/:userId', UserMiddleware, UpdateInfo);
+    router.patch('/api/citizens/transfer', UserMiddleware, TransferCitizen);
+
 }

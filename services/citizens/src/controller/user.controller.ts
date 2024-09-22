@@ -5,6 +5,7 @@ import { SYNCTYPE } from "../entity/sync-type";
 import { publishMessage } from '../rabbitmq/config';
 const CircuitBreaker = require("opossum");
 import axios from "axios";
+import { USER_STATUS } from "../entity/status.enum";
 
 export const Info = async (req: Request, res: Response) => {
     res.send({
@@ -16,8 +17,6 @@ export const Info = async (req: Request, res: Response) => {
 export const Register = async (req: Request, res: Response) => {
 
     try {
-
-
 
         const { email, ...body } = req.body;
 
@@ -49,13 +48,7 @@ export const Register = async (req: Request, res: Response) => {
         }
 
 
-        const options = {
-            timeout: 3000,
-            errorThresholdPercentage: 50,
-            resetTimeout: 30000
-        };
 
-        const breaker = new CircuitBreaker(axios.post, options);
 
         let canCreateUserRegistration = false;
 
@@ -68,6 +61,13 @@ export const Register = async (req: Request, res: Response) => {
 
         console.log('Registering user to gov carpeta ... ', userToRegisterToGovCarpeta);
 
+        const options = {
+            timeout: 3000,
+            errorThresholdPercentage: 50,
+            resetTimeout: 30000
+        };
+
+        const breaker = new CircuitBreaker(axios.post, options);
         await breaker.fire(`${process.env.GOV_CARPETA_BASE_URL}/apis/registerCitizen`, userToRegisterToGovCarpeta)
             .then(function (response) {
 
@@ -146,22 +146,51 @@ export const UpdateInfo = async (req: Request, res: Response) => {
         userToSend
     );
 
-
-
-
-
-    /*await producer.connect();
-    await producer.send({
-        topic: 'users-sync',
-        messages: [
-            { value }
-        ]
-    });*/
-
     res.send(user);
 
 }
 
 export const AuthenticatedUser = async (req: Request, res: Response) => {
     res.send(req["user"]);
+}
+
+export const TransferCitizen = async (req: Request, res: Response) => {
+
+    const citizen = req["user"];
+
+    const userToUnregisterFromGovCarpeta = {
+        id: citizen.id
+        , operatorId: process.env.OPERATOR_ID
+        , operatorName: process.env.OPERATOR_NAME
+    }
+
+    const options = {
+        timeout: 3000,
+        errorThresholdPercentage: 50,
+        resetTimeout: 30000
+    };
+
+    const breaker = new CircuitBreaker(axios.delete, options);
+    await breaker.fire(`${process.env.GOV_CARPETA_BASE_URL}/apis/unregisterCitizen`, userToUnregisterFromGovCarpeta)
+        .then(await async function (response) {
+
+            console.log('User unregistered from gov carpeta ... ', response);
+
+            citizen.status = USER_STATUS.transfered;
+            await getRepository(Citizen).save(citizen);
+
+            res.send(citizen);
+
+        })
+        .catch(await async function (error) {
+            console.log('Failed to unregister user from gov carpeta ... ', error.response);
+
+            res.status(500).json({
+                errorCode: 'FAILED_TO_UNREGISTER_USER_FROM_GOV_CARPETA'
+                , error: error?.response?.data
+                , errorDetails: error
+            });
+
+        });
+
 }
