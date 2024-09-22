@@ -568,21 +568,6 @@
     ]
 },
 {
-    "endpoint": "/users/api/info",
-    "input_headers": [
-        "*"
-    ],
-    "method": "GET",
-    "backend": [
-        {
-            "host": [
-                "http://users-api"
-            ],
-            "url_pattern": "/api/info"
-        }
-    ]
-},
-{
     "endpoint": "/users/api/admin/users/info/{userId}",
     "input_headers": [
         "*"
@@ -647,21 +632,6 @@
     }
 },
 {
-    "endpoint": "/users/api/ambassador/register",
-    "input_headers": [
-        "*"
-    ],
-    "method": "POST",
-    "backend": [
-        {
-            "host": [
-                "http://users-api"
-            ],
-            "url_pattern": "/api/ambassador/register"
-        }
-    ]
-},
-{
     "endpoint": "/users/api/ambassador/users/info/{userId}",
     "input_headers": [
         "*"
@@ -700,39 +670,6 @@
         "*"
     ],
     "method": "PUT",
-    "backend": [
-        {
-            "host": [
-                "http://users-api"
-            ],
-            "url_pattern": "/api/ambassador/user"
-        }
-    ],
-    "extra_config": {
-        "auth/validator": {
-            "alg": "RS256",
-            "audience": [
-                "ambassador-a7ed1"
-            ],
-            "cache": true,
-            "cookie_key": "jwt",
-            "issuer": "https://securetoken.google.com/ambassador-a7ed1",
-            "jwk_url": "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com",
-            "operation_debug": true,
-            "roles_key": "role",
-            "roles": [
-                "ambassador",
-                "admin"
-            ]
-        }
-    }
-},
-{
-    "endpoint": "/users/api/ambassador/user",
-    "input_headers": [
-        "*"
-    ],
-    "method": "GET",
     "backend": [
         {
             "host": [

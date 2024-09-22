@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-citizens-client-myphpadmin
+  namespace: citizens-folder
+  labels:
+    app: db-citizens-client-myphpadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-citizens-client-myphpadmin
+  template:
+    metadata:
+      labels:
+        app: db-citizens-client-myphpadmin
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: db-citizens-client-myphpadmin
+          image: phpmyadmin/phpmyadmin
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: db-citizens-mysql
+            - name: PMA_PORT
+              value: '3308'
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-citizens-root-password
+                  key: root-password
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "150m"
+              memory: "256Mi"

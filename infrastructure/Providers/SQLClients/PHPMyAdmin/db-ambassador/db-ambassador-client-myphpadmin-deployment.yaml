@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-ambassador-client-myphpadmin
+  namespace: ambassador-test
+  labels:
+    app: db-ambassador-client-myphpadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-ambassador-client-myphpadmin
+  template:
+    metadata:
+      labels:
+        app: db-ambassador-client-myphpadmin
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: db-ambassador-client-myphpadmin
+          image: phpmyadmin/phpmyadmin
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: db-ambassador-mysql
+            - name: PMA_PORT
+              value: '3306'
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-ambassador-root-password
+                  key: root-password
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "150m"
+              memory: "256Mi"

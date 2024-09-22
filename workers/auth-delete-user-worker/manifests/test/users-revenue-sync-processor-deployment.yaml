@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-revenue-sync-processor
+  namespace: ambassador-test
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: users-revenue-sync-processor
+  template:
+    metadata:
+      labels:
+        app: users-revenue-sync-processor
+    spec:
+      containers:
+      - name: users-revenue-sync-processor
+        image: ayalamac/arq-ambassador-users-revenue-sync-worker:v5
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: users-revenue-sync-processor
+        - secretRef:
+            name: users-revenue-sync-processor
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
