@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: citizens-transfer-confirmation-api
+  namespace: citizens-folder
+data:
+  CORS_ORIGINS: http://localhost:4200,*
+  RABBITMQ_HOST: rabbitmq-service.rabbitmq.svc.cluster.local
+  RABBITMQ_PORT: "5672"
+  SERVER_PORT: "8200"

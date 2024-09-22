@@ -39,3 +39,33 @@ export const UserMiddleware = async (req: Request, res: Response, next: Function
         });
     }
 }
+
+export const UnauthenticatedUserMiddleware = async (req: Request, res: Response, next: Function) => {
+    try {
+
+        const userId = parseInt(req?.params?.userId, 10);
+
+        console.log('req?.params?.userId', req?.params?.userId);
+        console.log('req?.params', req?.params);
+        console.log('userId', userId, typeof userId);
+
+        const user = await getRepository(Citizen).findOne(userId);
+
+        if (!user) {
+            return res.status(401).send({
+                message: 'user not found'
+            });
+        }
+
+        req["user"] = user;
+
+        next();
+    } catch (e) {
+        console.log('Error in UnauthenticatedUserMiddleware', e);
+        return res.status(401).send({
+            message: 'user not found'
+        });
+    }
+}
+
+

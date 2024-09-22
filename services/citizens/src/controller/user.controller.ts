@@ -159,10 +159,12 @@ export const TransferCitizen = async (req: Request, res: Response) => {
     const citizen = req["user"];
 
     const userToUnregisterFromGovCarpeta = {
-        id: citizen.id
-        , operatorId: process.env.OPERATOR_ID
-        , operatorName: process.env.OPERATOR_NAME
+        id: parseInt(citizen.id, 10)
+        , operatorId: process.env.OPERATOR_ID.toString()
+        , operatorName: process.env.OPERATOR_NAME.toString()
     }
+
+    console.log('Unregistering user from gov carpeta ... ', `${process.env.GOV_CARPETA_BASE_URL}/apis/unregisterCitizen`, userToUnregisterFromGovCarpeta);
 
     const options = {
         timeout: 3000,
@@ -171,19 +173,33 @@ export const TransferCitizen = async (req: Request, res: Response) => {
     };
 
     const breaker = new CircuitBreaker(axios.delete, options);
-    await breaker.fire(`${process.env.GOV_CARPETA_BASE_URL}/apis/unregisterCitizen`, userToUnregisterFromGovCarpeta)
+    await breaker.fire(`${process.env.GOV_CARPETA_BASE_URL}/apis/unregisterCitizen`, { data: userToUnregisterFromGovCarpeta })
         .then(await async function (response) {
 
             console.log('User unregistered from gov carpeta ... ', response);
+            const statusResponseCode = parseInt(response.status);
+            if (statusResponseCode > 201) {
+
+                console.log('Failed to unregister user from gov carpeta ... ', response.status, response.data);
+
+                res.status(500).json({
+                    errorCode: 'FAILED_TO_UNREGISTER_USER_FROM_GOV_CARPETA'
+                    , error: response?.data
+                    , errorDetails: response
+                });
+                return;
+            }
 
             citizen.status = USER_STATUS.transfered;
             await getRepository(Citizen).save(citizen);
 
             res.send(citizen);
 
+
+
         })
         .catch(await async function (error) {
-            console.log('Failed to unregister user from gov carpeta ... ', error.response);
+            console.log('Failed to unregister user from gov carpeta ... ', error);
 
             res.status(500).json({
                 errorCode: 'FAILED_TO_UNREGISTER_USER_FROM_GOV_CARPETA'
@@ -192,5 +208,40 @@ export const TransferCitizen = async (req: Request, res: Response) => {
             });
 
         });
+
+}
+
+export const DeleteCitizen = async (req: Request, res: Response) => {
+
+    try {
+        const citizen = req["user"];
+
+        console.log('Deleting citizen ... ', citizen);
+
+        await getRepository(Citizen).delete(citizen.id);
+
+        const userToSend = {
+            id: parseInt(citizen.id, 10)
+            , email: citizen.email
+        }
+
+        const value = JSON.stringify(
+            userToSend
+        );
+        const EXCHANGE_TYPE = 'fanout';
+        await publishMessage('delete_user_from_all_system', EXCHANGE_TYPE, 'delete_user_from_all_system', value);
+
+        res.status(201).json({
+            message: `Citizen with id ${citizen.id} deleted successfully`
+        });
+
+    } catch (error) {
+        console.log('Failed to delete citizen ... ', error);
+
+        res.status(500).json({
+            errorCode: 'FAILED_TO_DELETE_CITIZEN'
+            , errorDetails: error
+        });
+    }
 
 }

@@ -191,6 +191,36 @@
                     ]
                 }
             }
+        },
+        {
+            "endpoint": "/transfers/api/citizens/confirmTransfer",
+            "input_headers": [
+                "*"
+            ],
+            "method": "POST",
+            "backend": [
+                {
+                    "host": [
+                        "http://citizens-transfer-confirmation-api"
+                    ],
+                    "url_pattern": "/api/citizens/confirm-transfer"
+                }
+            ]
+        },
+        {
+            "endpoint": "/transfers/api/info",
+            "input_headers": [
+                "*"
+            ],
+            "method": "GET",
+            "backend": [
+                {
+                    "host": [
+                        "http://citizens-transfer-confirmation-api"
+                    ],
+                    "url_pattern": "/api/info"
+                }
+            ]
         }
     ]
 }

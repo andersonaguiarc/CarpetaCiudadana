@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { Register, UpdateInfo, Info, AuthenticatedUser, TransferCitizen } from "./controller/user.controller";
-import { UserMiddleware } from "./middleware/user.middleware";
+import { Register, UpdateInfo, Info, AuthenticatedUser, TransferCitizen, DeleteCitizen } from "./controller/user.controller";
+import { UserMiddleware, UnauthenticatedUserMiddleware } from "./middleware/user.middleware";
 
 export const routes = (router: Router) => {
 
@@ -11,5 +11,6 @@ export const routes = (router: Router) => {
     router.get('/api/citizens/user', UserMiddleware, AuthenticatedUser);
     router.put('/api/citizens/users/info/:userId', UserMiddleware, UpdateInfo);
     router.patch('/api/citizens/transfer', UserMiddleware, TransferCitizen);
+    router.delete('/api/citizens/:userId', UnauthenticatedUserMiddleware, DeleteCitizen);
 
 }

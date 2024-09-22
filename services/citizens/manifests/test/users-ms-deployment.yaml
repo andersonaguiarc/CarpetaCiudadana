@@ -45,21 +45,16 @@ spec:
             path: /api/info
             port: 8100
 
-      #- name: users-registration-processor
-      #  image: ayalamac/arq-ambassador-users-registration-worker:v5
-      #  imagePullPolicy: Always
-      #  envFrom:
-      #  - configMapRef:
-      #      name: users-registration-processor
-      #  - secretRef:
-      #      name: users-registration-processor
-      #  resources:
-      #    requests:
-      #      cpu: "50m"
-      #      memory: "128Mi"
-      #    limits:
-      #      cpu: "500m"
-      #      memory: "512Mi"
+      - name: transfer-citizen-confirmation-processor
+        image: spbpatino/citizens-folder-transfer-citizen-confirm-worker:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
       #      
       #- name: users-revenue-sync-processor
       #  image: ayalamac/arq-ambassador-users-revenue-sync-worker:v5
