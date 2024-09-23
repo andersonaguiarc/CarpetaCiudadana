@@ -249,7 +249,7 @@ class Handler:
             return jsonify({"error": "internal server error"}), 500
 
     def ping(self):
-        return jsonify({"message": "This is working!", "path": "/api/info"}), 500
+        return jsonify({"message": "This is working!", "path": "/api/info"}), 200
 
     def _document_exists(self, file_name, user_id):
         query = {
