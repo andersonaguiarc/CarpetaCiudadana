@@ -1,0 +1,17 @@
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: users-api
+  namespace: ambassador-test
+spec:
+  virtualhost:
+    fqdn: users.ambassadors.ink
+  routes:
+    - conditions:
+      - prefix: /users/
+      services:
+        - name: users-api
+          port: 80
+      pathRewritePolicy:
+        replacePrefix:
+          - replacement: /

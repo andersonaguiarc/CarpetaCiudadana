@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: files-api
+  namespace: citizens-folder
+data:
+  CORS_ORIGINS: http://localhost:4200,*
+  PORT: '8350'
+  AWS_SERVER_BUCKET: test-govcarpeta
+  

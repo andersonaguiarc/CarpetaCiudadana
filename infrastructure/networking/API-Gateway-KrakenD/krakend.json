@@ -251,6 +251,53 @@
                     "url_pattern": "/api/citizens/external-register"
                 }
             ]
+        },
+        {
+            "endpoint": "/operators/api/operators",
+            "input_headers": [
+                "*"
+            ],
+            "method": "GET",
+            "backend": [
+                {
+                    "host": [
+                        "http://operators-api"
+                    ],
+                    "url_pattern": "/api/operators"
+                }
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "audience": [
+                        "citizens-folder"
+                    ],
+                    "cache": true,
+                    "cookie_key": "jwt",
+                    "issuer": "https://securetoken.google.com/citizens-folder",
+                    "jwk_url": "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com",
+                    "operation_debug": true,
+                    "roles_key": "role",
+                    "roles": [
+                        "citizen"
+                    ]
+                }
+            }
+        },
+        {
+            "endpoint": "/operators/api/info",
+            "input_headers": [
+                "*"
+            ],
+            "method": "GET",
+            "backend": [
+                {
+                    "host": [
+                        "http://operators-api"
+                    ],
+                    "url_pattern": "/api/info"
+                }
+            ]
         }
     ]
 }
