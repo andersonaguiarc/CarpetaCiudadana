@@ -68,7 +68,7 @@ def create_app(handler):
         methods=["DELETE"],
     )
     app.add_url_rule(
-        "/api/info/",
+        "/api/info",
         view_func=handler.ping,
         methods=["GET"],
     )
