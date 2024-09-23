@@ -298,6 +298,21 @@
                     "url_pattern": "/api/info"
                 }
             ]
+        },
+        {
+            "endpoint": "/files/api/info",
+            "input_headers": [
+                "*"
+            ],
+            "method": "GET",
+            "backend": [
+                {
+                    "host": [
+                        "http://files-api"
+                    ],
+                    "url_pattern": "/api/info"
+                }
+            ]
         }
     ]
 }

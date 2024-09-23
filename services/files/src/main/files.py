@@ -55,7 +55,7 @@ def main():
     )(handler.get_signed_url)
 
     app.route(
-        "/api/info/",
+        "/api/info",
         methods=["GET"],
     )(handler.ping)
 
