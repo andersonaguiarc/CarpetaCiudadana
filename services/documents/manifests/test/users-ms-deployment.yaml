@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-api
+  namespace: citizens-folder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: users-api
+    spec:
+      containers:
+      - name: users-api
+        image: spbpatino/citizens-folder-citizens:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: users-api
+        - secretRef:
+            name: users-api
+        ports:
+        - containerPort: 8100
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /api/info
+            port: 8100
+        livenessProbe:
+          httpGet:
+            path: /api/info
+            port: 8100
+
+      - name: transfer-citizen-confirmation-processor
+        image: spbpatino/citizens-folder-transfer-citizen-confirm-worker:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+      
+      - name: delete-transfer-citizen-processor
+        image: spbpatino/citizens-folder-delete-transfer-citizen-worker:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
