@@ -49,7 +49,7 @@ export class RegisterComponent {
     }
 
     // Realizar la solicitud POST usando el proxy
-    this.http.post('http://134.122.25.105:30000/registration-exp/api/citizens/registrations', formData)
+    this.http.post('/api/registration-exp/api/citizens/registrations', formData)
     .subscribe({
       next: (response) => {
         console.log('Usuario registrado con éxito', response); 
