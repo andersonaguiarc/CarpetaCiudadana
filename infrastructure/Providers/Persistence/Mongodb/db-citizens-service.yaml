@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-citizens-mysql
+  namespace: citizens-folder
+spec:
+  selector:
+    app: db-citizens-mysql
+  ports:
+  - protocol: TCP
+    port: 3308
+    targetPort: 3306

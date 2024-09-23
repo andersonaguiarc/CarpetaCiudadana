@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: users-api
+  name: documents-api
   namespace: citizens-folder
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: users-api
+    name: documents-api
   minReplicas: 1
   maxReplicas: 3
   metrics:
