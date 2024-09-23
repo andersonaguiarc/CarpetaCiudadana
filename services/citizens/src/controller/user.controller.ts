@@ -193,9 +193,15 @@ export const TransferCitizen = async (req: Request, res: Response) => {
             citizen.status = USER_STATUS.transfered;
             await getRepository(Citizen).save(citizen);
 
+            if (req["notifyToReplier"]) {
+                const value = JSON.stringify(citizen);
+                const QUEUE_NAME = 'citizen_to_delete_and_transfer_replier';
+
+                await publishMessage(QUEUE_NAME, 'direct', QUEUE_NAME, value);
+            }
+
+
             res.send(citizen);
-
-
 
         })
         .catch(await async function (error) {
@@ -208,6 +214,34 @@ export const TransferCitizen = async (req: Request, res: Response) => {
             });
 
         });
+
+}
+
+export const TransferCitizenReply = async (req: Request, res: Response) => {
+
+    try {
+
+        const citizenId = parseInt(req.body.userId, 10);
+
+        console.log('Transfer citizen reply citizenId... ', citizenId);
+
+        req["user"] = await getRepository(Citizen).findOne(citizenId);
+
+        req["notifyToReplier"] = true;
+
+        console.log('Transfer citizen reply User... ', req["user"]);
+
+        await TransferCitizen(req, res);
+
+    } catch (error) {
+        console.log('Failed to transfer citizen reply ... ', error);
+
+        res.status(500).json({
+            errorCode: 'FAILED_TO_TRANSFER_CITIZEN'
+            , errorDetails: error
+        });
+
+    }
 
 }
 
@@ -245,3 +279,4 @@ export const DeleteCitizen = async (req: Request, res: Response) => {
     }
 
 }
+

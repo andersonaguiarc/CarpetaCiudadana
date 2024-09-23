@@ -55,19 +55,14 @@ spec:
           limits:
             cpu: "500m"
             memory: "512Mi"
-      #      
-      #- name: users-revenue-sync-processor
-      #  image: ayalamac/arq-ambassador-users-revenue-sync-worker:v5
-      #  imagePullPolicy: Always
-      #  envFrom:
-      #  - configMapRef:
-      #      name: users-revenue-sync-processor
-      #  - secretRef:
-      #      name: users-revenue-sync-processor
-      #  resources:
-      #    requests:
-      #      cpu: "50m"
-      #      memory: "128Mi"
-      #    limits:
-      #      cpu: "500m"
-      #      memory: "512Mi"
+      
+      - name: delete-transfer-citizen-processor
+        image: spbpatino/citizens-folder-delete-transfer-citizen-worker:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
