@@ -1,0 +1,18 @@
+---
+services:
+  files:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DEBUG=True
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
+    command: ["python3", "src/main/files.py"]
+    networks:
+      - app-network
+
+networks:
+  app-network:
