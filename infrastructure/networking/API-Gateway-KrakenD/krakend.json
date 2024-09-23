@@ -221,6 +221,36 @@
                     "url_pattern": "/api/info"
                 }
             ]
+        },
+        {
+            "endpoint": "/external-transfers/api/info",
+            "input_headers": [
+                "*"
+            ],
+            "method": "GET",
+            "backend": [
+                {
+                    "host": [
+                        "http://external-citizen-register-api"
+                    ],
+                    "url_pattern": "/api/info"
+                }
+            ]
+        },
+        {
+            "endpoint": "/api/transferCitizen",
+            "input_headers": [
+                "*"
+            ],
+            "method": "POST",
+            "backend": [
+                {
+                    "host": [
+                        "http://external-citizen-register-api"
+                    ],
+                    "url_pattern": "/api/citizens/external-register"
+                }
+            ]
         }
     ]
 }
