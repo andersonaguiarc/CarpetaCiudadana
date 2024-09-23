@@ -1,24 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: docdb-core-redis
-  namespace: ambassador-test
+  name: docdb-operators-redis
+  namespace: citizens-folder
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: docdb-core-redis
+      app: docdb-operators-redis
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: docdb-core-redis
+        app: docdb-operators-redis
     spec:
       containers:
-      - name: docdb-core-redis
+      - name: docdb-operators-redis
         image: redis/redis-stack
         imagePullPolicy: Always
         ports:
         - containerPort: 6379
         - containerPort: 8001
+
