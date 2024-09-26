@@ -40,6 +40,11 @@ def main():
     )(handler.set_file)
 
     app.route(
+        f"{base_path}/transfer/<path:file_name>",
+        methods=["POST"],
+    )(handler.set_transfer_file)
+
+    app.route(
         f"{base_path}/<path:file_name>",
         methods=["DELETE"],
     )(handler.delete_file)

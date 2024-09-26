@@ -53,6 +53,11 @@ def create_app(handler):
         methods=["POST"],
     )
     app.add_url_rule(
+        f"{base_path}/transfer_documents/",
+        view_func=handler.transfer_documents,
+        methods=["POST"],
+    )
+    app.add_url_rule(
         f"{base_path}/<path:file_name>",
         view_func=handler.get_document,
         methods=["GET"],

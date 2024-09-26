@@ -35,6 +35,20 @@ class Handler:
             print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
+    def set_transfer_file(self, file_name):
+        file_data = request.get_data()
+
+        try:
+            self.client.put_object(
+                Bucket=self.bucket,
+                Key=file_name,
+                Body=file_data,
+            )
+            return make_response("", 201)
+        except Exception as err:
+            print(err, flush=True)
+            return jsonify({"error": "internal server error"}), 500
+
     @token_required
     def delete_file(self, file_name):
 

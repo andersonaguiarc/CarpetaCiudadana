@@ -9,6 +9,8 @@ from src.middleware.authenticate import token_required
 from pymongo.database import Database
 import datetime
 from circuitbreaker import circuit
+from pydantic import BaseModel
+from typing import List, Dict
 
 
 class Handler:
@@ -43,12 +45,12 @@ class Handler:
             },
         )
 
+        # @circuit(fallback_function=fallback)
         response = requests.post(self.govcarpeta_url, json=response.json())
 
     @token_required
     def create_document(self, file_name):
 
-        # @circuit(fallback_function=fallback)
         data = request.data
 
         if not data:
@@ -169,6 +171,50 @@ class Handler:
             return make_response(response.json(), 201)
         except Exception:
             return jsonify({"error": "internal server error"}), 500
+
+    def transfer_documents(self):
+        class Document(BaseModel):
+            path: str
+            url: str
+
+        class Transfer(BaseModel):
+            user_id: int
+            documents: List[Document]
+
+        body = request.get_json()
+
+        if body is None:
+            return jsonify({"error": "no body provided"}), 400
+
+        try:
+            transfer = Transfer(**body)
+        except Exception:
+            return jsonify({"error": "invalid body"}), 400
+
+        results = []
+
+        for document in transfer.documents:
+
+            response = requests.get(document.url)
+            data = response.content
+
+            document_record = {
+                "_id": f"{transfer.user_id}/{document.path}",
+                "path": document.path,
+                "user_id": transfer.user_id,
+                "last_modified": datetime.datetime.now(),
+                "size": len(data),
+            }
+            self.documents.insert_one(document_record)
+
+            response = requests.post(
+                f"{self.files_url}/api/v1/files/transfer/{transfer.user_id}/{document.path}",
+                data=data,
+            )
+
+            results.append(document_record)
+
+        return jsonify({"count": len(results), "results": results}), 201
 
     @token_required
     def update_document(self, file_name):
