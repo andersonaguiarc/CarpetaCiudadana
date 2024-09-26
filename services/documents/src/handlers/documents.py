@@ -85,6 +85,7 @@ class Handler:
 
             if response.status_code != 201:
                 # TODO: circuit break
+                print(response.json(), flush=True)
                 return jsonify({"error": "could not create document"}), 500
 
             return jsonify(document), 201
@@ -146,6 +147,26 @@ class Handler:
             }
 
             return jsonify(response), 200
+        except Exception:
+            return jsonify({"error": "internal server error"}), 500
+
+    def get_all_files(self, user_id):
+
+        query = {
+            "user_id": int(user_id),
+        }
+
+        try:
+            documents = self.documents.find(query)
+
+            results = list(map(lambda x: x["_id"], documents))
+            body = {"paths": results}
+            response = requests.post(
+                f"{self.files_url}/api/v1/files/sign_all_url/",
+                json=body,
+            )
+
+            return make_response(response.json(), 201)
         except Exception:
             return jsonify({"error": "internal server error"}), 500
 

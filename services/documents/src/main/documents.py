@@ -38,6 +38,11 @@ def create_app(handler):
         methods=["POST"],
     )
     app.add_url_rule(
+        f"{base_path}/files/<user_id>",
+        view_func=handler.get_all_files,
+        methods=["POST"],
+    )
+    app.add_url_rule(
         f"{base_path}/",
         view_func=handler.get_all_documents,
         methods=["GET"],

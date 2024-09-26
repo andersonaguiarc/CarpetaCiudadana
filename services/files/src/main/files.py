@@ -55,6 +55,11 @@ def main():
     )(handler.get_signed_url)
 
     app.route(
+        f"{base_path}/sign_all_url/",
+        methods=["POST"],
+    )(handler.get_all_signed_urls)
+
+    app.route(
         "/api/info/",
         methods=["GET"],
     )(handler.ping)

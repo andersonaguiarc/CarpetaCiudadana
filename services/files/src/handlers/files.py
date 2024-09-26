@@ -31,7 +31,8 @@ class Handler:
                 Body=file_data,
             )
             return make_response("", 201)
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     @token_required
@@ -51,7 +52,8 @@ class Handler:
             )
 
             return make_response("Deleted", 201)
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     def delete_all_files(self, user_id):
@@ -62,7 +64,8 @@ class Handler:
             self.fs.delete(path, recursive=True)
 
             return make_response("Deleted", 201)
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     @token_required
@@ -87,7 +90,35 @@ class Handler:
             )
 
             return jsonify({"url": url}), 201
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
+            return jsonify({"error": "internal server error"}), 500
+
+    def get_all_signed_urls(self):
+
+        body = request.get_json()
+
+        try:
+            response = {"results": []}
+
+            for path in body["paths"]:
+                if not self._file_exists(path):
+                    continue
+
+                url = self.client.generate_presigned_url(
+                    ClientMethod="get_object",
+                    Params={
+                        "Bucket": self.bucket,
+                        "Key": path,
+                    },
+                    ExpiresIn=604800,
+                )
+                i = path.index("/")
+                response["results"].append({"url": url, "path": path[i + 1 :]})
+
+            return jsonify(response), 201
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     def ping(self):
