@@ -10,16 +10,22 @@ let channel: amqp.Channel;
 
 const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
     if (msg) {
-        const messageContent = msg.content.toString();
+        try {
 
-        console.log('Received message content:', messageContent);
+            const messageContent = msg.content.toString();
 
-        const parsedMessage = JSON.parse(messageContent);
-        console.log('Received message:', parsedMessage);
+            console.log('Received message content:', messageContent);
 
-        await axios.patch(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/transfer-reply`, parsedMessage);
+            const parsedMessage = JSON.parse(messageContent);
+            console.log('Received message:', parsedMessage);
 
-        channel.ack(msg);
+            await axios.patch(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/transfer-reply`, parsedMessage);
+
+            channel.ack(msg);
+        } catch (error) {
+            console.log('Error in RabbitMQ consumer:', error);
+            channel.nack(msg, false, false);
+        }
     }
 };
 
