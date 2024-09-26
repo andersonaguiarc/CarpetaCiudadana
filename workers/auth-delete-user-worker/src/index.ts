@@ -10,13 +10,18 @@ let channel: amqp.Channel;
 
 const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
     if (msg) {
-        const messageContent = msg.content.toString();
-        const parsedMessage = JSON.parse(messageContent);
-        console.log('Received message:', parsedMessage);
+        try {
+            const messageContent = msg.content.toString();
+            const parsedMessage = JSON.parse(messageContent);
+            console.log('Received message:', parsedMessage);
 
-        await axios.delete(`${process.env.AUTH_MICROSERVICE_URL}/api/citizens/${parsedMessage.email}`);
+            await axios.delete(`${process.env.AUTH_MICROSERVICE_URL}/api/citizens/${parsedMessage.email}`);
 
-        channel.ack(msg);
+            channel.ack(msg);
+        } catch (error) {
+            console.log('Error in consumer:', error);
+            channel.nack(msg, false, false);
+        }
     }
 };
 
@@ -30,7 +35,7 @@ const run = async () => {
 
         channel.consume(QUEUE_NAME, consumeMessage, { noAck: false });
     } catch (error) {
-        console.error('Error in RabbitMQ consumer:', error);
+        console.log('Error in RabbitMQ consumer:', error);
     }
 };
 

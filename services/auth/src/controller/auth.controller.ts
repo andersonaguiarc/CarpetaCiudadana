@@ -116,7 +116,7 @@ export const DeleteUserByEmail = async (req: Request, res: Response) => {
             message: `User with email ${email} has been deleted successfully.`,
         });
     } catch (error) {
-        console.error('Error deleting user:', error);
+        console.log('Error deleting user:', error);
         res.status(500).send({
             message: 'Error deleting user',
             error: error.message,

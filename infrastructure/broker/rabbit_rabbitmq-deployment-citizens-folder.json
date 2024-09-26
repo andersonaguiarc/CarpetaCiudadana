@@ -1,0 +1,263 @@
+{
+    "rabbit_version": "3.8.34",
+    "rabbitmq_version": "3.8.34",
+    "product_name": "RabbitMQ",
+    "product_version": "3.8.34",
+    "users": [
+        {
+            "name": "admin",
+            "password_hash": "pX6T832QFW8ZR+AKSbGhA/UQLu3yvLA0BUnMvyuFpiGzGTJS",
+            "hashing_algorithm": "rabbit_password_hashing_sha256",
+            "tags": "administrator",
+            "limits": {}
+        }
+    ],
+    "vhosts": [
+        {
+            "name": "/"
+        }
+    ],
+    "permissions": [
+        {
+            "user": "admin",
+            "vhost": "/",
+            "configure": ".*",
+            "write": ".*",
+            "read": ".*"
+        }
+    ],
+    "topic_permissions": [],
+    "parameters": [],
+    "global_parameters": [
+        {
+            "name": "internal_cluster_id",
+            "value": "rabbitmq-cluster-id-i2auKBRLfTY6xHD5yX300w"
+        }
+    ],
+    "policies": [],
+    "queues": [
+        {
+            "name": "citizen_to_delete_and_transfer_replier",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "classic"
+            }
+        },
+        {
+            "name": "citizen_to_register",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "classic"
+            }
+        },
+        {
+            "name": "transfer_citizen_confirmation",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "classic"
+            }
+        },
+        {
+            "name": "delete_user_from_auth",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "classic"
+            }
+        },
+        {
+            "name": "external_citizen_to_register",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "classic"
+            }
+        },
+        {
+            "name": "delete_user_from_documents",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "classic"
+            }
+        },
+        {
+            "name": "citizen_to_update_to_documents",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "classic"
+            }
+        },
+        {
+            "name": "citizen_to_delete_and_transfer",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "classic"
+            }
+        }
+    ],
+    "exchanges": [
+        {
+            "name": "delete_user_from_auth",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "external_citizen_to_register",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "citizen_to_delete_and_transfer",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "citizen_to_delete_and_transfer_replier",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "transfer_citizen_confirmation_delayed",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {
+                "x-delayed-type": "direct"
+            }
+        },
+        {
+            "name": "transfer_citizen_confirmation",
+            "vhost": "/",
+            "type": "fanout",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "citizen_to_update",
+            "vhost": "/",
+            "type": "fanout",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "citizen_to_register",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "delete_user_from_all_system",
+            "vhost": "/",
+            "type": "fanout",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        }
+    ],
+    "bindings": [
+        {
+            "source": "citizen_to_delete_and_transfer",
+            "vhost": "/",
+            "destination": "citizen_to_delete_and_transfer",
+            "destination_type": "queue",
+            "routing_key": "citizen_to_delete_and_transfer",
+            "arguments": {}
+        },
+        {
+            "source": "citizen_to_delete_and_transfer_replier",
+            "vhost": "/",
+            "destination": "citizen_to_delete_and_transfer_replier",
+            "destination_type": "queue",
+            "routing_key": "citizen_to_delete_and_transfer_replier",
+            "arguments": {}
+        },
+        {
+            "source": "citizen_to_register",
+            "vhost": "/",
+            "destination": "citizen_to_register",
+            "destination_type": "queue",
+            "routing_key": "citizen_to_register",
+            "arguments": {}
+        },
+        {
+            "source": "citizen_to_register",
+            "vhost": "/",
+            "destination": "citizen_to_update_to_documents",
+            "destination_type": "queue",
+            "routing_key": "citizen_to_update_to_documents",
+            "arguments": {}
+        },
+        {
+            "source": "delete_user_from_all_system",
+            "vhost": "/",
+            "destination": "delete_user_from_auth",
+            "destination_type": "queue",
+            "routing_key": "delete_user_from_auth",
+            "arguments": {}
+        },
+        {
+            "source": "delete_user_from_auth",
+            "vhost": "/",
+            "destination": "delete_user_from_auth",
+            "destination_type": "queue",
+            "routing_key": "delete_user_from_auth",
+            "arguments": {}
+        },
+        {
+            "source": "external_citizen_to_register",
+            "vhost": "/",
+            "destination": "external_citizen_to_register",
+            "destination_type": "queue",
+            "routing_key": "external_citizen_to_register",
+            "arguments": {}
+        },
+        {
+            "source": "transfer_citizen_confirmation",
+            "vhost": "/",
+            "destination": "transfer_citizen_confirmation",
+            "destination_type": "queue",
+            "routing_key": "transfer_citizen_confirmation",
+            "arguments": {}
+        }
+    ]
+}
