@@ -6,7 +6,7 @@ metadata:
   name: db-citizens-client-myphpadmin
   namespace: citizens-folder
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: db-citizens-client-myphpadmin
   ports:
@@ -14,4 +14,3 @@ spec:
     port: 80
     protocol: TCP
     targetPort: 80
-    nodePort: 31111

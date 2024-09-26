@@ -298,6 +298,260 @@
                     "url_pattern": "/api/info"
                 }
             ]
+        },
+        {
+            "endpoint": "/files/api/info",
+            "input_headers": [
+                "*"
+            ],
+            "method": "GET",
+            "backend": [
+                {
+                    "host": [
+                        "http://files-api"
+                    ],
+                    "url_pattern": "/api/info"
+                }
+            ]
+        },
+        {
+            "endpoint": "/documents/api/info",
+            "input_headers": [
+                "*"
+            ],
+            "method": "GET",
+            "backend": [
+                {
+                    "host": [
+                        "http://documents-api"
+                    ],
+                    "url_pattern": "/api/info"
+                }
+            ]
+        },
+        {
+            "endpoint": "/documents/api/documents/{slug}",
+            "input_headers": [
+                "*"
+            ],
+            "method": "POST",
+            "backend": [
+                {
+                    "host": [
+                        "http://documents-api"
+                    ],
+                    "url_pattern": "/api/v1/documents/{slug}"
+                }
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "audience": [
+                        "citizens-folder"
+                    ],
+                    "cache": true,
+                    "cookie_key": "jwt",
+                    "issuer": "https://securetoken.google.com/citizens-folder",
+                    "jwk_url": "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com",
+                    "operation_debug": true,
+                    "roles_key": "role",
+                    "roles": [
+                        "citizen"
+                    ]
+                }
+            }
+        },
+        {
+            "endpoint": "/documents/api/documents/certify/{slug}",
+            "input_headers": [
+                "*"
+            ],
+            "method": "POST",
+            "backend": [
+                {
+                    "host": [
+                        "http://documents-api"
+                    ],
+                    "url_pattern": "/api/v1/documents/certify/{slug}"
+                }
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "audience": [
+                        "citizens-folder"
+                    ],
+                    "cache": true,
+                    "cookie_key": "jwt",
+                    "issuer": "https://securetoken.google.com/citizens-folder",
+                    "jwk_url": "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com",
+                    "operation_debug": true,
+                    "roles_key": "role",
+                    "roles": [
+                        "citizen"
+                    ]
+                }
+            }
+        },
+        {
+            "endpoint": "/documents/api/documents/sign-file/{slug}",
+            "input_headers": [
+                "*"
+            ],
+            "method": "POST",
+            "backend": [
+                {
+                    "host": [
+                        "http://documents-api"
+                    ],
+                    "url_pattern": "/api/v1/documents/file/{slug}"
+                }
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "audience": [
+                        "citizens-folder"
+                    ],
+                    "cache": true,
+                    "cookie_key": "jwt",
+                    "issuer": "https://securetoken.google.com/citizens-folder",
+                    "jwk_url": "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com",
+                    "operation_debug": true,
+                    "roles_key": "role",
+                    "roles": [
+                        "citizen"
+                    ]
+                }
+            }
+        },
+        {
+            "endpoint": "/documents/api/documents",
+            "input_headers": [
+                "*"
+            ],
+            "method": "GET",
+            "backend": [
+                {
+                    "host": [
+                        "http://documents-api"
+                    ],
+                    "url_pattern": "/api/v1/documents/"
+                }
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "audience": [
+                        "citizens-folder"
+                    ],
+                    "cache": true,
+                    "cookie_key": "jwt",
+                    "issuer": "https://securetoken.google.com/citizens-folder",
+                    "jwk_url": "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com",
+                    "operation_debug": true,
+                    "roles_key": "role",
+                    "roles": [
+                        "citizen"
+                    ]
+                }
+            }
+        },
+        {
+            "endpoint": "/documents/api/documents/{slug}",
+            "input_headers": [
+                "*"
+            ],
+            "method": "GET",
+            "backend": [
+                {
+                    "host": [
+                        "http://documents-api"
+                    ],
+                    "url_pattern": "/api/v1/documents/{slug}"
+                }
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "audience": [
+                        "citizens-folder"
+                    ],
+                    "cache": true,
+                    "cookie_key": "jwt",
+                    "issuer": "https://securetoken.google.com/citizens-folder",
+                    "jwk_url": "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com",
+                    "operation_debug": true,
+                    "roles_key": "role",
+                    "roles": [
+                        "citizen"
+                    ]
+                }
+            }
+        },
+        {
+            "endpoint": "/documents/api/documents/{slug}",
+            "input_headers": [
+                "*"
+            ],
+            "method": "PUT",
+            "backend": [
+                {
+                    "host": [
+                        "http://documents-api"
+                    ],
+                    "url_pattern": "/api/v1/documents/{slug}"
+                }
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "audience": [
+                        "citizens-folder"
+                    ],
+                    "cache": true,
+                    "cookie_key": "jwt",
+                    "issuer": "https://securetoken.google.com/citizens-folder",
+                    "jwk_url": "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com",
+                    "operation_debug": true,
+                    "roles_key": "role",
+                    "roles": [
+                        "citizen"
+                    ]
+                }
+            }
+        },
+        {
+            "endpoint": "/documents/api/documents/{slug}",
+            "input_headers": [
+                "*"
+            ],
+            "method": "DELETE",
+            "backend": [
+                {
+                    "host": [
+                        "http://documents-api"
+                    ],
+                    "url_pattern": "/api/v1/documents/{slug}"
+                }
+            ],
+            "extra_config": {
+                "auth/validator": {
+                    "alg": "RS256",
+                    "audience": [
+                        "citizens-folder"
+                    ],
+                    "cache": true,
+                    "cookie_key": "jwt",
+                    "issuer": "https://securetoken.google.com/citizens-folder",
+                    "jwk_url": "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com",
+                    "operation_debug": true,
+                    "roles_key": "role",
+                    "roles": [
+                        "citizen"
+                    ]
+                }
+            }
         }
     ]
 }

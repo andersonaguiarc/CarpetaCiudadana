@@ -2,17 +2,17 @@ apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
   labels:
-    app: db-citizens-client-myphpadmin
-  name: db-citizens-client-myphpadmin
-  namespace: citizens-folder
+    app: rabbitmq-service
+  name: rabbitmq-service
+  namespace: rabbitmq
 spec:
   virtualhost:
-    fqdn: citizensdb.fastidentify.com
+    fqdn: broker.fastidentify.com
     #tls:
     #  secretName: citizensdb-ambassador-tls
   routes:
     - conditions:
       - prefix: /
       services:
-        - name: db-citizens-client-myphpadmin
+        - name: rabbitmq-service
           port: 80

@@ -2,12 +2,12 @@ apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
   name: api-gateway-krakend
-  namespace: ambassador-test
+  namespace: citizens-folder
 spec:
   virtualhost:
-    fqdn: api.ambassadors.ink
-    tls:
-      secretName: api-ambassador-tls
+    fqdn: api.fastidentify.com
+    #tls:
+    #  secretName: api-ambassador-tls
     corsPolicy:
         allowCredentials: true
         allowOrigin:

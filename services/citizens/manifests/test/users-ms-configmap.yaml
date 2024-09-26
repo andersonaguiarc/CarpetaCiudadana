@@ -14,5 +14,6 @@ data:
   GOV_CARPETA_BASE_URL: https://govcarpeta-apis-83e1c996379d.herokuapp.com
   OPERATOR_ID: "66c9e09e66ca9f0015a8afad"
   OPERATOR_NAME: "Operador Carpeta Virtual"
-  TRANSFER_CONFIRMATION_QUEUE_NAME: transfer_citizen_confirmation
   CITIZENS_MICROSERVICE_URL: http://users-api
+  TRANSFER_CONFIRMATION_QUEUE_NAME: transfer_citizen_confirmation
+  USER_TO_REGISTER_QUEUE_NAME: citizen_to_register
