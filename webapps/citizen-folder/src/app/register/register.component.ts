@@ -53,6 +53,7 @@ export class RegisterComponent {
     .subscribe({
       next: (response) => {
         console.log('Usuario registrado con éxito', response); 
+        this.router.navigate(['/login']);
       },
       error: (error) => {
         console.error('Error al registrar usuario:', error);

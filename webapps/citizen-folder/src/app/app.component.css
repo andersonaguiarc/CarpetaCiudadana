@@ -12,21 +12,22 @@
 }
 .perfil-button, .back-button {
     background-color: var(--colorBotones);
-    border: 2px solid var(--colorBotones); /* Borde */
+    border: none;
     border-radius: 8px;
     color: white;
+    padding: 10px 15px;
     font-size: var(--md);
     font-weight: bold;
-    padding: 12px 20px;
     cursor: pointer;
-    width: auto;
+    transition: background-color 0.3s ease;
 }
 
 
 
 .primary-button:hover, .back-button:hover, .accept-button:hover, .change-password-button:hover, .edit-button:hover {
     background-color: #3a8ca5;
-    border-color: #3a8ca5;
+    border-color: #3a8ca5; 
+    text-decoration: underline;  
 }
 
 /* Estilos globales para formularios */

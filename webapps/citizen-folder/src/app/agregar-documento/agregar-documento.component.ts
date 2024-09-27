@@ -1,6 +1,6 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Component } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-agregar-documento',
@@ -8,59 +8,99 @@ import { Observable } from 'rxjs';
   styleUrls: ['./agregar-documento.component.css']
 })
 export class AgregarDocumentoComponent {
-  @ViewChild('fileInput', { static: false }) fileInput!: ElementRef; // Agregamos 'fileInput' con ViewChild
-
   selectedFile: File | null = null;
+  fileSlug: string = '';
+  isFileLoaded: boolean = false;  // Indicador de que el archivo fue cargado
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private router: Router) {}
 
-  // Función que maneja el evento de arrastrar y soltar
+  // Método para manejar la selección del archivo
+  onFileSelect(event: any): void {
+    const target = event.target as HTMLInputElement;
+    const files = target?.files;
+    
+    if (files && files.length > 0) {
+      this.selectedFile = files[0];
+      this.fileSlug = this.generateSlug(this.selectedFile.name);
+      this.isFileLoaded = true; // Activar el indicador
+    } else {
+      console.error('No se ha seleccionado ningún archivo.');
+    }
+  }
+
+  // Convertir el nombre del archivo en un slug válido
+  generateSlug(fileName: string): string {
+    return fileName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_') // Reemplaza caracteres especiales con "_"
+      .replace(/(^_|_$)/g, ''); // Elimina guiones bajos adicionales
+  }
+
+  // Método para subir el archivo
+  onSubmit(): void {
+    if (!this.selectedFile) {
+      console.error('No se ha seleccionado ningún archivo.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('Archivo', this.selectedFile);
+
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      console.error('Token no disponible.');
+      return;
+    }
+
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    // Enviar el archivo a la API
+    this.http.post(`/api/documents/api/documents/${this.fileSlug}`, formData, { headers })
+      .subscribe(
+        (response) => {
+          console.log('Archivo subido exitosamente:', response);
+          this.isFileLoaded = false; // Resetear el indicador después de cargar
+        },
+        (error) => {
+          console.error('Error al subir el archivo:', error);
+        }
+      );
+  }
+
+  // Eventos de drag and drop
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
   onFileDrop(event: DragEvent): void {
     event.preventDefault();
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
       this.selectedFile = files[0];
-      console.log("Documento arrastrado:", this.selectedFile);
+      this.fileSlug = this.generateSlug(this.selectedFile.name);
+      this.isFileLoaded = true; // Activar el indicador
     }
   }
 
-  // Función para permitir el comportamiento de arrastre
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
+  triggerFileSelect(fileInput: HTMLInputElement): void {
+    fileInput.click();
   }
 
-  // Función para manejar la selección manual de archivos (Buscar en tu PC)
-  onFileSelect(event: any): void {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      this.selectedFile = files[0];
-      console.log("Documento seleccionado:", this.selectedFile);
-    }
+  // Navegación
+  goToDocuments(): void {
+    this.router?.navigate(['/main-page']);
   }
 
-  // Método que se activará cuando se presione el botón de "Aceptar"
-  onSubmit(): void {
-    if (this.selectedFile) {
-      this.uploadFile(this.selectedFile).subscribe(response => {
-        console.log("Documento enviado con éxito", response);
-      }, error => {
-        console.error("Error al enviar el documento", error);
-      });
-    } else {
-      console.error("No se ha seleccionado ningún archivo.");
-    }
+  goToCertificar(): void {
+    this.router?.navigate(['/certificar']);
   }
 
-  // Método para cargar el archivo a la API
-  uploadFile(file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
-    const apiUrl = 'https://api.example.com/upload'; // Reemplazar con el endpoint de tu API
-    return this.http.post(apiUrl, formData);
+  goToProfile(): void {
+    this.router?.navigate(['/profile']);
   }
 
-  // Método para abrir el input de archivos al hacer clic en el botón
-  openFileSelector(): void {
-    this.fileInput.nativeElement.click(); // Abre el input file
+  logout(): void {
+    sessionStorage.removeItem('token');
+    this.router?.navigate(['/login']);
   }
 }
