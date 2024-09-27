@@ -5,7 +5,7 @@ metadata:
   namespace: citizens-folder
 data:
   CORS_ORIGINS: localhost,*
-  RABBITMQ_HOST: rabbitmq-service.rabbitmq.svc.cluster.local
+  RABBITMQ_HOST: production-rabbitmqcluster.rabbitmq-system.svc.cluster.local
   RABBITMQ_PORT: "5672"
   MYSQL_DATABASE: citizens
   MYSQL_HOST: db-citizens-mysql

@@ -1,6 +1,7 @@
 import * as amqp from 'amqplib';
 import axios from 'axios';
 import dotenv from 'dotenv';
+const CircuitBreaker = require("opossum");
 dotenv.config();
 
 const RABBITMQ_URL = `amqp://${process.env.RABBITMQ_USER}:${process.env.RABBITMQ_PASSWORD}@${process.env.RABBITMQ_HOST}:${process.env.RABBITMQ_PORT}`;
@@ -10,14 +11,44 @@ let channel: amqp.Channel;
 
 const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
     if (msg) {
-        const messageContent = msg.content.toString();
-        const parsedMessage = JSON.parse(messageContent);
-        console.log('Received message:', parsedMessage);
 
-        await axios.delete(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/${parsedMessage.id}`);
+        try {
+
+            const messageContent = msg.content.toString();
+            const parsedMessage = JSON.parse(messageContent);
+            console.log('Received message:', parsedMessage);
+            const options = {
+                timeout: 3000,
+                errorThresholdPercentage: 50,
+                resetTimeout: 30000
+            };
+
+            const breaker = new CircuitBreaker(axios.delete, options);
+            await breaker.fire(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/${parsedMessage.id}`, parsedMessage)
+                .then(function (response) {
+                    console.log('User deleted with success', response.data);
+                    channel.ack(msg);
+
+                })
+                .catch(function (error) {
+                    console.log('Failed to delete user', error.response.data);
+                    channel.nack(msg, false, false);
+                });
+
+            channel.ack(msg);
+        } catch (error) {
+            console.log('Error in RabbitMQ consumer:', error);
+            channel.nack(msg, false, false);
+        }
 
         channel.ack(msg);
+
+    } catch (error) {
+        console.log('Error in RabbitMQ consumer:', error);
+        channel.nack(msg, false, false);
+
     }
+}
 };
 
 const run = async () => {

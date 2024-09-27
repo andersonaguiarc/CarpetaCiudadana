@@ -48,6 +48,11 @@ spec:
       - name: transfer-citizen-confirmation-processor
         image: spbpatino/citizens-folder-transfer-citizen-confirm-worker:latest
         imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: users-api
+        - secretRef:
+            name: users-api
         resources:
           requests:
             cpu: "50m"
@@ -59,6 +64,11 @@ spec:
       - name: delete-transfer-citizen-processor
         image: spbpatino/citizens-folder-delete-transfer-citizen-worker:latest
         imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: users-api
+        - secretRef:
+            name: users-api
         resources:
           requests:
             cpu: "50m"
@@ -70,6 +80,11 @@ spec:
       - name: register-citizen-processor
         image: spbpatino/citizens-folder-register-citizen-worker:latest
         imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: users-api
+        - secretRef:
+            name: users-api
         resources:
           requests:
             cpu: "50m"

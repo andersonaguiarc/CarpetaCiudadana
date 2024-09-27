@@ -48,6 +48,11 @@ spec:
       - name: auth-delete-user-worker
         image: spbpatino/citizens-folder-auth-delete-user:latest
         imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: auth-api
+        - secretRef:
+            name: auth-api
         resources:
           requests:
             cpu: "50m"
