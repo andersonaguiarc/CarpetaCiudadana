@@ -63,7 +63,8 @@ export class AgregarDocumentoComponent {
         .subscribe(
           (response) => {
             console.log('Archivo subido exitosamente:', response);
-            this.isFileLoaded = false; // Resetear el indicador después de cargar
+            alert('Documento agregado con éxito'); // Mostrar alerta
+            this.resetUploadArea(); // Limpiar la zona de arrastre
           },
           (error) => {
             console.error('Error al subir el archivo:', error);
@@ -77,6 +78,13 @@ export class AgregarDocumentoComponent {
 
     // Leer el archivo seleccionado como ArrayBuffer (binario)
     reader.readAsArrayBuffer(this.selectedFile);
+  }
+
+  // Método para resetear la zona de arrastre y la selección del archivo
+  resetUploadArea(): void {
+    this.selectedFile = null;
+    this.fileSlug = '';
+    this.isFileLoaded = false;
   }
 
   // Eventos de drag and drop
