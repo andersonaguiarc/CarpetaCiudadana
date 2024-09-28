@@ -17,3 +17,4 @@ data:
   CITIZENS_MICROSERVICE_URL: http://users-api
   TRANSFER_CONFIRMATION_QUEUE_NAME: transfer_citizen_confirmation
   USER_TO_REGISTER_QUEUE_NAME: citizen_to_register
+  DELETE_TRANSFER_QUEUE_NAME: citizen_to_delete_and_transfer

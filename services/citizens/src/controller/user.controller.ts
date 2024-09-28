@@ -194,6 +194,7 @@ export const TransferCitizen = async (req: Request, res: Response) => {
             await getRepository(Citizen).save(citizen);
 
             if (req["notifyToReplier"]) {
+                citizen.operatorUrl = req.body.operatorUrl;
                 const value = JSON.stringify(citizen);
                 const QUEUE_NAME = 'citizen_to_delete_and_transfer_replier';
 
