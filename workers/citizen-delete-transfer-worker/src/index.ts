@@ -25,20 +25,18 @@ const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
                 errorThresholdPercentage: 50,
                 resetTimeout: 30000
             };
-    
+
             const breaker = new CircuitBreaker(axios.patch, options);
-            await breaker.fire(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/transfer-reply`, parsedMessage)
+            await breaker.fire(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/transfer-reply/${parseInt(parsedMessage.userId.toString(), 10)}`, parsedMessage)
                 .then(function (response) {
                     console.log('User transfered with success', response.data);
                     channel.ack(msg);
-    
+
                 })
                 .catch(function (error) {
                     console.log('Failed to transfer user', error.response.data);
                     channel.nack(msg, false, false);
                 });
-
-            channel.ack(msg);
         } catch (error) {
             console.log('Error in RabbitMQ consumer:', error);
             channel.nack(msg, false, false);
@@ -48,7 +46,7 @@ const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
 
 const run = async () => {
     try {
-        
+
         console.log('Connecting to RabbitMQ:', RABBITMQ_URL);
 
         const connection = await amqp.connect(RABBITMQ_URL);
