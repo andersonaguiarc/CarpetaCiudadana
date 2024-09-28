@@ -193,7 +193,7 @@
             }
         },
         {
-            "endpoint": "/transfers/api/citizens/confirmTransfer",
+            "endpoint": "/transfers/api/confirmTransfer",
             "input_headers": [
                 "*"
             ],

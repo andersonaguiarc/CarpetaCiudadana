@@ -15,6 +15,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { TransferenciaComponent } from './transferencia/transferencia.component';
 
+
 @NgModule({
   declarations: [
     AppComponent,

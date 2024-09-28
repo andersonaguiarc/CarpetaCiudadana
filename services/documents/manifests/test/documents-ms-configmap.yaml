@@ -5,7 +5,7 @@ metadata:
   namespace: citizens-folder
 data:
   CORS_ORIGINS: localhost,*
-  AMQP_URL: rabbitmq-service.rabbitmq.svc.cluster.local:5672
+  AMQP_URL: production-rabbitmqcluster.rabbitmq-system.svc.cluster.local:5672
   PORT: "8400"
   FILES_URL: http://files-api
   GOVCARPETA_URL: https://govcarpeta-apis-83e1c996379d.herokuapp.com

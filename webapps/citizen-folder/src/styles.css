@@ -30,8 +30,16 @@ a {
     font-size: var(--md);
 }
 
-a:hover {
-    text-decoration: underline;
+a.evento {
+    color: var(--colorTexto);  
+    cursor: pointer;  
+    text-decoration: none;  
+    transition: color 0.3s ease;  
+}
+
+a.evento:hover {
+    color: #3a8ca5;  
+    text-decoration: underline;  
 }
 
 /* Inputs y campos */

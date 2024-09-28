@@ -1,6 +1,6 @@
 {
     "/api": {
-        "target": "http://134.122.25.105:30000",
+        "target": " http://api.fastidentify.com/",
         "secure": false,
         "changeOrigin": true,
         "pathRewrite": {

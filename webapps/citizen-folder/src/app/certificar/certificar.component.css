@@ -1,35 +1,18 @@
-@font-face {
-    font-family: 'Montserrat', sans-serif;
-    src: ('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;1,600&display=swap');
-    font-style: normal;
-    font-weight: normal;
-}
-
-:root {
-    --colorBotones: #4bb4ca;
-    --colorFondo: #f5f5f5;
-    --fuenteBoton: #040404;
-    --colorTexto: #000000;
-    --inputBg: #f0f0f0;
-    --md: 16px;
-    --lg: 18px;
-}
-
-body {
-    background-color: var(--colorFondo);
-    margin: 0;
-    font-family: 'Montserrat', sans-serif;
-}
-
+/* Contenedor principal con grid layout */
 .main-container {
     display: grid;
-    grid-template-columns: 250px 1fr;
+    grid-template-columns: 250px 1fr;  /* Sidebar y contenido principal */
     height: 100vh;
+    background-color: var(--colorFondo);  /* Fondo general */
 }
 
+/* Sidebar (barra lateral) */
 .sidebar {
-    background-color: var(--inputBg);
+    background-color: var(--sidebarBg);
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espaciado entre los elementos */
 }
 
 .sidebar-header {
@@ -54,33 +37,32 @@ body {
 
 .menu li a {
     display: block;
+    padding: 12px 20px;
     background-color: var(--colorBotones);
     color: white;
-    font-size: var(--md);
-    padding: 12px 20px;
-    text-decoration: none;
     border-radius: 8px;
     text-align: center;
     transition: background-color 0.3s ease;
 }
 
+/* Botón Certificar Documentos siempre activo (presionado) */
+.menu li a.active {
+    background-color: #3a8ca5;
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Efecto hover para los botones de la lista */
 .menu li a:hover {
     background-color: #3a8ca5;
+    cursor: pointer; /* Cambia el cursor a una manita al hacer hover */
 }
 
-.menu li a.active {
-    background-color: #3a8ca5; /* Un color más oscuro para el botón activo */
-    color: white;
-    font-weight: bold;
-    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.2); /* Sombras internas para darle el efecto de "presionado" */
-}
-
-
+/* Contenido principal */
 .content {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    position: relative;
+    gap: 20px; /* Espacio entre elementos del contenido */
 }
 
 .content-header {
@@ -97,24 +79,11 @@ body {
     border: 1px solid #ccc;
 }
 
-.profile-button {
-    background-color: var(--colorBotones);
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: var(--md);
-    font-weight: bold;
-}
-
-.profile-button:hover {
-    background-color: #3a8ca5;
-}
-
+/* Tabla de documentos */
 .document-list table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 20px;
 }
 
 .document-list th, .document-list td {
@@ -124,31 +93,34 @@ body {
 }
 
 .document-list th {
-    background-color: var(--inputBg);
+    background-color: var(--sidebarBg);
+    color: #333;
 }
 
-.select-checkbox {
-    cursor: pointer;
+.document-list td:nth-child(4) {
+    font-weight: bold;
+    color: #333;
 }
 
+/* Botón Compartir */
 .share-button {
     background-color: var(--colorBotones);
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     color: white;
-    padding: 8px;
+    padding: 8px 16px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .share-button:hover {
     background-color: #3a8ca5;
 }
 
-/* Botón de Aceptar */
+/* Botón Aceptar en la parte inferior */
 .accept-button-container {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
+    text-align: right;
+    margin-top: 20px;
 }
 
 .accept-button {
@@ -156,10 +128,11 @@ body {
     border: none;
     border-radius: 8px;
     color: white;
-    padding: 12px 20px;
+    padding: 10px 15px;
     font-size: var(--md);
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .accept-button:hover {

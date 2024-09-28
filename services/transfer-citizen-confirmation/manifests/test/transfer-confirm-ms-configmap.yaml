@@ -5,6 +5,6 @@ metadata:
   namespace: citizens-folder
 data:
   CORS_ORIGINS: http://localhost:4200,*
-  RABBITMQ_HOST: rabbitmq-service.rabbitmq.svc.cluster.local
+  RABBITMQ_HOST: production-rabbitmqcluster.rabbitmq-system.svc.cluster.local
   RABBITMQ_PORT: "5672"
   SERVER_PORT: "8200"
