@@ -7,11 +7,33 @@ from src.handlers.documents import Handler
 
 def create_amqp_connection():
     """Create and return an AMQP connection."""
-    url = os.environ.get("AMQP_URL", "")
-    if not url:
-        raise ValueError("AMQP_URL environment variable is required.")
-    params = pika.URLParameters(url)
-    return pika.BlockingConnection(params)
+    # url = os.environ.get("AMQP_URL", "")
+    # if not url:
+    #     raise ValueError("AMQP_URL environment variable is required.")
+    # params = pika.URLParameters(url)
+    # return pika.BlockingConnection(params)
+    amqp_user = os.environ.get("AMQP_USER", "")
+    if not amqp_user:
+        raise ValueError("AMQP_USER environment variable is required.")
+    amqp_password = os.environ.get("AMQP_PASSWORD", "")
+    if not amqp_password:
+        raise ValueError("AMQP_PASSWORD environment variable is required.")
+    amqp_host = os.environ.get("AMQP_HOST", "")
+    if not amqp_host:
+        raise ValueError("AMQP_HOST environment variable is required.")
+    amqp_port = os.environ.get("AMQP_PORT", "")
+    if not amqp_port:
+        raise ValueError("AMQP_PORT environment variable is required.")
+    credentials = pika.PlainCredentials(amqp_user, amqp_password)
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(
+            host=amqp_host,
+            credentials=credentials,
+            port=amqp_port,
+            # heartbeat=0,
+        )
+    )
+    return connection
 
 
 def create_mongo_client():
@@ -88,8 +110,8 @@ def create_app(handler):
 
 def main():
     """Main entry point for the application."""
-    # amqp_connection = create_amqp_connection()
-    amqp_connection = None
+    amqp_connection = create_amqp_connection()
+    # amqp_connection = None
     mongo_client = create_mongo_client()
     db = mongo_client["db"]
 
@@ -111,7 +133,7 @@ def main():
 
     handler = Handler(
         db,
-        amqp_connection,
+        amqp_connection.channel(),
         amqp_exchange,
         amqp_routing_key,
         files_url,

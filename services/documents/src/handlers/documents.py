@@ -10,7 +10,8 @@ from pymongo.database import Database
 import datetime
 from circuitbreaker import circuit
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List
+import json
 
 
 class Handler:
@@ -18,19 +19,32 @@ class Handler:
     def __init__(
         self,
         db: Database,
-        amqp_connection,
+        amqp_channel,
         amqp_exchange,
         amqp_routing_key,
         files_url,
         govcarpeta_url,
     ):
         self.db = db
-        self.amqp_connection = amqp_connection
+        self.amqp_channel = amqp_channel
         self.amqp_exchange = amqp_exchange
         self.amqp_routing_key = amqp_routing_key
         self.documents = db.documents
         self.files_url = files_url
         self.govcarpeta_url = govcarpeta_url
+
+    @circuit(failure_threshold=2)
+    def certify(self, response, user_id, file_name):
+        govcarpeta_response = requests.put(
+            f"{self.govcarpeta_url}/apis/authenticateDocument",
+            json={
+                "idCitizen": user_id,
+                "UrlDocument": response.json()["url"],
+                "documentTitle": file_name,
+            },
+        )
+        govcarpeta_response.raise_for_status()
+        print(response.json(), flush=True)
 
     @token_required
     def certify_document(self, file_name):
@@ -38,15 +52,43 @@ class Handler:
         if not self._document_exists(file_name, user_id):
             return jsonify({"error": "document not found"}), 404
 
-        response = requests.post(
-            f"{self.files_url}/api/v1/files/sign_url/{file_name}",
-            headers={
-                "Authorization": request.headers.get("Authorization"),
-            },
-        )
+        try:
+            response = requests.post(
+                f"{self.files_url}/api/v1/files/sign_url/{file_name}",
+                headers={
+                    "Authorization": request.headers.get("Authorization"),
+                },
+            )
 
-        # @circuit(fallback_function=fallback)
-        response = requests.post(self.govcarpeta_url, json=response.json())
+        except Exception as err:
+            print(err, flush=True)
+            return jsonify({"error": "internal server error"}), 500
+
+        def fallback():
+            body = {
+                "user_id": user_id,
+                "file_name": file_name,
+                "url": response.json()["url"],
+            }
+            message = json.dumps(body)
+            self.amqp_channel.basic_publish(
+                exchange=self.amqp_exchange,
+                routing_key=self.amqp_routing_key,
+                body=message,
+            )
+
+        try:
+            self.certify(response, user_id, file_name)
+        except Exception as err:
+            print(err, flush=True)
+            try:
+                fallback()
+            except Exception as err:
+                print(err, flush=True)
+                return jsonify({"error": "internal server error"}), 500
+
+        # except Exception as err:
+        return jsonify({"message": "document certification in progress"}), 200
 
     @token_required
     def create_document(self, file_name):
@@ -73,7 +115,8 @@ class Handler:
 
             self.documents.insert_one(document)
 
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
         try:
@@ -91,7 +134,8 @@ class Handler:
                 return jsonify({"error": "could not create document"}), 500
 
             return jsonify(document), 201
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     @token_required
@@ -111,7 +155,8 @@ class Handler:
             )
             return make_response(response.json(), response.status_code)
 
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     @token_required
@@ -126,7 +171,8 @@ class Handler:
         try:
             document = self.documents.find_one(query)
             return jsonify(document), 200
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     @token_required
@@ -149,7 +195,8 @@ class Handler:
             }
 
             return jsonify(response), 200
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     def get_all_files(self, user_id):
@@ -169,7 +216,8 @@ class Handler:
             )
 
             return make_response(response.json(), 201)
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     def transfer_documents(self):
@@ -188,7 +236,8 @@ class Handler:
 
         try:
             transfer = Transfer(**body)
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "invalid body"}), 400
 
         results = []
@@ -237,7 +286,8 @@ class Handler:
                 },
             )
 
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
         document = self.documents.find_one({"_id": f"{user_id}/{file_name}"})
@@ -257,7 +307,8 @@ class Handler:
                 return jsonify({"error": "internal server error"}), 500
 
             return jsonify(document), 200
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     @token_required
@@ -272,7 +323,8 @@ class Handler:
                 return jsonify({"error": "document does not exist"}), 404
 
             self.documents.delete_one(query)
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
         try:
@@ -289,7 +341,8 @@ class Handler:
                 return jsonify({"error": "could not delete document"}), 500
 
             return make_response("Deleted", 201)
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     def delete_all_documents(self, user_id):
@@ -300,7 +353,8 @@ class Handler:
 
         try:
             self.documents.delete_many(query)
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
         try:
@@ -312,7 +366,8 @@ class Handler:
                 return jsonify({"error": "internal server error"}), 500
 
             return make_response("Deleted", 201)
-        except Exception:
+        except Exception as err:
+            print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
 
     def ping(self):
