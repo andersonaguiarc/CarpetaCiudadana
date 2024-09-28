@@ -10,7 +10,7 @@ from pymongo.database import Database
 import datetime
 from circuitbreaker import circuit
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 import json
 
 
@@ -44,7 +44,7 @@ class Handler:
             },
         )
         govcarpeta_response.raise_for_status()
-        print(response.json(), flush=True)
+        print(govcarpeta_response.json(), flush=True)
 
     @token_required
     def certify_document(self, file_name):
@@ -79,6 +79,7 @@ class Handler:
 
         try:
             self.certify(response, user_id, file_name)
+            return jsonify({"message": "document certification successful"}), 200
         except Exception as err:
             print(err, flush=True)
             try:
@@ -221,13 +222,10 @@ class Handler:
             return jsonify({"error": "internal server error"}), 500
 
     def transfer_documents(self):
-        class Document(BaseModel):
-            path: str
-            url: str
 
         class Transfer(BaseModel):
-            user_id: int
-            documents: List[Document]
+            id: int
+            Documents: Dict[str, List[str]]
 
         body = request.get_json()
 
@@ -241,23 +239,38 @@ class Handler:
             return jsonify({"error": "invalid body"}), 400
 
         results = []
+        user_id = transfer.id
 
-        for document in transfer.documents:
+        for key, val in transfer.Documents.items():
 
-            response = requests.get(document.url)
+            url = val[0]
+            path = key
+
+            response = requests.get(url)
             data = response.content
 
             document_record = {
-                "_id": f"{transfer.user_id}/{document.path}",
-                "path": document.path,
-                "user_id": transfer.user_id,
+                "_id": f"{user_id}/{path}",
+                "path": path,
+                "user_id": user_id,
                 "last_modified": datetime.datetime.now(),
                 "size": len(data),
             }
-            self.documents.insert_one(document_record)
+            if self._document_exists(path, user_id):
+                self.documents.update_one(
+                    {"_id": f"{user_id}/{path}"},
+                    {
+                        "$set": {
+                            "last_modified": datetime.datetime.now(),
+                            "size": len(data),
+                        }
+                    },
+                )
+            else:
+                self.documents.insert_one(document_record)
 
             response = requests.post(
-                f"{self.files_url}/api/v1/files/transfer/{transfer.user_id}/{document.path}",
+                f"{self.files_url}/api/v1/files/transfer/{user_id}/{path}",
                 data=data,
             )
 
