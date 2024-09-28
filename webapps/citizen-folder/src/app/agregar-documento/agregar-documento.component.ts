@@ -36,15 +36,12 @@ export class AgregarDocumentoComponent {
       .replace(/(^_|_$)/g, ''); // Elimina guiones bajos adicionales
   }
 
-  // Método para subir el archivo
+  // Método para subir el archivo como binario sin FormData
   onSubmit(): void {
     if (!this.selectedFile) {
       console.error('No se ha seleccionado ningún archivo.');
       return;
     }
-
-    const formData = new FormData();
-    formData.append('Archivo', this.selectedFile);
 
     const token = sessionStorage.getItem('token');
     if (!token) {
@@ -52,19 +49,34 @@ export class AgregarDocumentoComponent {
       return;
     }
 
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    // Leer el archivo como binario usando FileReader
+    const reader = new FileReader();
+    reader.onload = () => {
+      const fileContents = reader.result as ArrayBuffer;
 
-    // Enviar el archivo a la API
-    this.http.post(`/api/documents/api/documents/${this.fileSlug}`, formData, { headers })
-      .subscribe(
-        (response) => {
-          console.log('Archivo subido exitosamente:', response);
-          this.isFileLoaded = false; // Resetear el indicador después de cargar
-        },
-        (error) => {
-          console.error('Error al subir el archivo:', error);
-        }
-      );
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`,
+      });
+
+      // Enviar el archivo binario directamente en el cuerpo de la solicitud
+      this.http.post(`/api/documents/api/documents/${this.fileSlug}`, fileContents, { headers })
+        .subscribe(
+          (response) => {
+            console.log('Archivo subido exitosamente:', response);
+            this.isFileLoaded = false; // Resetear el indicador después de cargar
+          },
+          (error) => {
+            console.error('Error al subir el archivo:', error);
+          }
+        );
+    };
+
+    reader.onerror = (error) => {
+      console.error('Error al leer el archivo:', error);
+    };
+
+    // Leer el archivo seleccionado como ArrayBuffer (binario)
+    reader.readAsArrayBuffer(this.selectedFile);
   }
 
   // Eventos de drag and drop

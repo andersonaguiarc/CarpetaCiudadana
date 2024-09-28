@@ -33,25 +33,34 @@ export class MainPageComponent implements OnInit {
     const token = sessionStorage.getItem('token'); // Obtener el token de sessionStorage
 
     if (token) {
-      this.http.get<any[]>(this.apiUrl, {
+      this.http.get<any>(this.apiUrl, {
         headers: {
           Authorization: `Bearer ${token}` // Agregar el token en el encabezado de la solicitud
         }
       }).subscribe({
         next: (response) => {
-          this.documents = response;
+          if (response.results) {
+            // Mapeamos los documentos en la estructura deseada
+            this.documents = response.results.map((doc: any) => ({
+              name: doc._id,
+              size: (doc.size / 1024).toFixed(2), // Convertimos el tamaño de bytes a KB
+              modified: doc.last_modified, // Usamos la fecha de modificación del documento
+              path: doc.path // Usamos este campo para operaciones futuras si es necesario
+            }));
+          }
           console.log('Documentos cargados:', this.documents);
         },
         error: (error) => {
           console.error('Error al cargar los documentos:', error);
         }
-    });
+      });
     } else {
       console.error('No se encontró token');
       this.router.navigate(['/login']); // Redirigir si no hay token
     }
   }
 
+  // Navegación
   goToCertificar(): void {
     this.router.navigate(['/certificar']);
   }

@@ -102,28 +102,13 @@
     color: #333;
 }
 
-/* Botón Compartir */
-.share-button {
-    background-color: var(--colorBotones);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.share-button:hover {
-    background-color: #3a8ca5;
-}
-
 /* Botón Aceptar en la parte inferior */
-.accept-button-container {
+.upload-button-container {
     text-align: right;
     margin-top: 20px;
 }
 
-.accept-button {
+.upload-button {
     background-color: var(--colorBotones);
     border: none;
     border-radius: 8px;
@@ -135,6 +120,6 @@
     transition: background-color 0.3s ease;
 }
 
-.accept-button:hover {
+.upload-button:hover {
     background-color: #3a8ca5;
 }

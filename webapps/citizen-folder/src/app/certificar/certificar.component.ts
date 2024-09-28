@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';  // Importamos HttpClient para hacer la solicitud a la API
+import { HttpClient } from '@angular/common/http'; // Importamos HttpClient para hacer la solicitud a la API
 import { Router } from '@angular/router';
 
 @Component({
@@ -12,7 +12,6 @@ export class CertificarComponent implements OnInit {
   selectedDocument: any = null; // Documento seleccionado
   apiUrl: string = '/api/documents/api/documents'; // API para listar documentos
 
-  
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
@@ -34,14 +33,22 @@ export class CertificarComponent implements OnInit {
     const token = sessionStorage.getItem('token'); // Obtener el token de sessionStorage
 
     if (token) {
-      this.http.get<any[]>(this.apiUrl, {
+      this.http.get<any>(this.apiUrl, {
         headers: {
           Authorization: `Bearer ${token}` // Agregar el token en el encabezado de la solicitud
         }
       }).subscribe({
         next: (response) => {
-          this.documents = response;
-          console.log('Documentos cargados:', this.documents);
+          if (response.results) {
+            this.documents = response.results.map((doc: any) => ({
+              name: doc._id,
+              size: (doc.size / 1024).toFixed(2), // Convertimos el tamaño de bytes a KB
+              modified: doc.last_modified, // Usamos la fecha de modificación del documento
+              path: doc.path // Usamos este campo para operaciones futuras si es necesario
+            }));
+          } else {
+            console.error('La propiedad "results" no está en la respuesta.');
+          }
         },
         error: (error) => {
           console.error('Error al cargar los documentos:', error);
@@ -55,14 +62,19 @@ export class CertificarComponent implements OnInit {
 
   // Método para seleccionar un solo documento
   selectDocument(doc: any): void {
-    this.selectedDocument = doc;
+    // Solo permitir seleccionar un documento a la vez
+    if (this.selectedDocument === doc) {
+      this.selectedDocument = null; // Deseleccionar si el mismo documento se vuelve a hacer clic
+    } else {
+      this.selectedDocument = doc; // Seleccionar el nuevo documento
+    }
   }
 
   // Método para enviar el documento seleccionado para certificación
   certifyDocument(): void {
     if (this.selectedDocument) {
       console.log('Certificando el documento:', this.selectedDocument);
-      const slug = this.selectedDocument.slug;
+      const slug = this.selectedDocument.path; // Usamos el path del documento como identificador
       const token = sessionStorage.getItem('token');
   
       if (!token) {
@@ -93,6 +105,7 @@ export class CertificarComponent implements OnInit {
     }
   }
 
+  // Navegación
   goToMainPage(): void {
     this.router.navigate(['/main-page']);
   }

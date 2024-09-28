@@ -1,49 +1,49 @@
 <div class="main-container">
-    <aside class="sidebar">
+  <aside class="sidebar">
       <div class="sidebar-header">
-        <img src="../../assets/carpeta.png" alt="home" class="icon">
-        <h2>Mi Carpeta</h2>
+          <img src="../../assets/carpeta.png" alt="home" class="icon">
+          <h2>Mi Carpeta</h2>
       </div>
       <ul class="menu">
-        <li><a (click)="goToMainPage()">Mis Documentos</a></li>
-        <li><a class="active">Certificar Documentos</a></li> <!-- Clase active aquí -->
-        <li><a (click)="goToNuevoDocumento()">Nuevo Documento</a></li>
-        <li><a (click)="logout()">Cerrar Sesión</a></li>
+          <li><a (click)="goToMainPage()">Mis Documentos</a></li>
+          <li><a class="active">Certificar Documentos</a></li>
+          <li><a (click)="goToNuevoDocumento()">Nuevo Documento</a></li>
+          <li><a (click)="logout()">Cerrar Sesión</a></li>
       </ul>
-    </aside>
-  
-    <section class="content">
+  </aside>
+
+  <section class="content">
       <header class="content-header">
-        <input type="text" placeholder="Buscar" class="search-bar">
-        <button class="profile-button perfil-button" (click)="goToProfile()">Perfil</button>
+          <input type="text" placeholder="Buscar" class="search-bar">
+          <button class="profile-button perfil-button" (click)="goToProfile()">Perfil</button>
       </header>
-  
+
+      <!-- Lista de documentos -->
       <section class="document-list">
-        <table>
-          <thead>
-            <tr>
-              <th>Seleccionar</th>
-              <th>Nombre</th>
-              <th>Tamaño</th>
-              <th>Última Modificación</th>
-              <th>Compartir</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let doc of documents">
-              <td><input type="radio" name="document" (change)="selectDocument(doc)"></td>
-              <td>{{ doc.name }}</td>
-              <td>{{ doc.size }} KB</td>
-              <td>{{ doc.lastModified | date:'short' }}</td>
-              <td><button class="share-button">🔗</button></td>
-            </tr>
-          </tbody>
-        </table>
+          <table>
+              <thead>
+                  <tr>
+                      <th>Seleccionar</th>
+                      <th>Nombre</th>
+                      <th>Tamaño (KB)</th>
+                      <th>Última Modificación</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr *ngFor="let document of documents">
+                      <td>
+                          <input type="radio" name="selectedDocument" (change)="selectDocument(document)" 
+                                 [checked]="selectedDocument === document">
+                      </td>
+                      <td>{{ document.name }}</td>
+                      <td>{{ document.size }} KB</td>
+                      <td>{{ document.modified | date:'short' }}</td>
+                  </tr>
+              </tbody>
+          </table>
       </section>
-  
-      <div class="accept-button-container">
-        <button class="accept-button" (click)="certifyDocument()">Aceptar</button>
-      </div>
-    </section>
-  </div>
-  
+
+      <!-- Botón para certificar el documento -->
+      <button class="upload-button" (click)="certifyDocument()">Aceptar</button>
+  </section>
+</div>
