@@ -45,19 +45,19 @@ spec:
             path: /api/info
             port: 8450
 
-     #- name: citizens-transfer-to-certificate-processor
-     #  image: spbpatino/citizens-folder-citizens-transfer-to-certificate-worker:latest
-     #  imagePullPolicy: Always
-     #  envFrom:
-     #  - configMapRef:
-     #      name: citizens-transfer-api
-     #  - secretRef:
-     #      name: citizens-transfer-api
-     #  resources:
-     #    requests:
-     #      cpu: "50m"
-     #      memory: "128Mi"
-     #    limits:
-     #      cpu: "500m"
-     #      memory: "512Mi"
+      - name: citizens-transfer-document-processor
+        image: spbpatino/citizens-folder-transfer-document-worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: citizens-transfer-api
+        - secretRef:
+            name: citizens-transfer-api
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
 

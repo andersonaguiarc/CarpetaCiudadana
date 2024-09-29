@@ -6,18 +6,18 @@ from src.consumer.consumer import Consumer
 
 def create_amqp_connection():
     """Create and return an AMQP connection."""
-    amqp_user = os.environ.get("AMQP_USER", "")
+    amqp_user = os.environ.get("USER_RABBITMQ", "")
     if not amqp_user:
-        raise ValueError("AMQP_USER environment variable is required.")
-    amqp_password = os.environ.get("AMQP_PASSWORD", "")
+        raise ValueError("USER_RABBITMQ environment variable is required.")
+    amqp_password = os.environ.get("PASS_RABBITMQ", "")
     if not amqp_password:
-        raise ValueError("AMQP_PASSWORD environment variable is required.")
-    amqp_host = os.environ.get("AMQP_HOST", "")
+        raise ValueError("PASS_RABBITMQ environment variable is required.")
+    amqp_host = os.environ.get("HOST_RABBITMQ", "")
     if not amqp_host:
-        raise ValueError("AMQP_HOST environment variable is required.")
-    amqp_port = os.environ.get("AMQP_PORT", "")
+        raise ValueError("HOST_RABBITMQ environment variable is required.")
+    amqp_port = os.environ.get("PORT_RABBITMQ", "")
     if not amqp_port:
-        raise ValueError("AMQP_PORT environment variable is required.")
+        raise ValueError("PORT_RABBITMQ environment variable is required.")
     credentials = pika.PlainCredentials(amqp_user, amqp_password)
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(
@@ -34,13 +34,13 @@ def main():
     """Main entry point for the application."""
     amqp_connection = create_amqp_connection()
 
-    documents_url = os.getenv("DOCUMENTS_URL")
+    documents_url = os.getenv("DOCUMENT_API_URL")
     if not documents_url:
-        raise ValueError("DOCUMENTS_URL environment variable is required.")
+        raise ValueError("DOCUMENT_API_URL environment variable is required.")
 
-    amqp_queue = os.getenv("AMQP_QUEUE")
+    amqp_queue = os.getenv("QUEUE_NAME_CITIZEN_TO_TRANSFER_REPLIER")
     if not amqp_queue:
-        raise ValueError("AMQP_QUEUE environment variable is required.")
+        raise ValueError("QUEUE_NAME_CITIZEN_TO_TRANSFER_REPLIER environment variable is required.")
 
     consumer = Consumer(
         amqp_connection,
