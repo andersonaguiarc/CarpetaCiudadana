@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http'; // Importamos HttpClientModule y provideHttpClient
+import { FormsModule } from '@angular/forms';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MainPageComponent } from './main-page/main-page.component';
@@ -14,6 +15,8 @@ import { AgregarDocumentoComponent } from './agregar-documento/agregar-documento
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { TransferenciaComponent } from './transferencia/transferencia.component';
+import { ProcesoTransferenciaComponent } from './proceso-transferencia/proceso-transferencia.component';
+
 
 
 @NgModule({
@@ -27,14 +30,16 @@ import { TransferenciaComponent } from './transferencia/transferencia.component'
     AgregarDocumentoComponent,
     ForgotPasswordComponent,
     ChangePasswordComponent,
-    TransferenciaComponent
+    TransferenciaComponent,
+    ProcesoTransferenciaComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     RouterModule,
     ReactiveFormsModule,
-    HttpClientModule  // Asegúrate de importar HttpClientModule
+    HttpClientModule,  // Asegúrate de importar HttpClientModule
+    FormsModule
   ],
   providers: [
     provideClientHydration(),

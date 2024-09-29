@@ -47,10 +47,14 @@
 
 .menu li a:hover {
     background-color: #3a8ca5;
+    cursor: pointer; /* Cambia el cursor a una manita al hacer hover */
 }
-
+/* Estilo para el botón activo (presionado) */
 .menu li a.active {
-    background-color: #3a8ca5;
+    background-color: #3a8ca5; /* Fondo del botón activo */
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.2); /* Sombra interna */
+    color: white; /* Color del texto en el botón activo */
+    font-weight: bold; /* Texto en negrita */
 }
 
 /* Contenido principal */

@@ -3,12 +3,12 @@
     <aside class="sidebar">
         <div class="sidebar-header">
             <img src="../../assets/carpeta.png" alt="icono de carpeta" class="icon">
-            <h2 class="sidebar-title">Mi Carpeta</h2> <!-- Agregué la clase sidebar-title -->
+            <h2 class="sidebar-title">Mi Carpeta</h2>
         </div>
         <ul class="menu">
-            <li><a href="#">Perfil</a></li>
-            <li><a href="#" class="active">Solicitud de Transferencia</a></li>
-            <li><a href="#">Cerrar Sesión</a></li>
+            <li><a (click)="goToProfile()">Perfil</a></li>
+            <li><a class="active">Solicitud de Transferencia</a></li>
+            <li><a (click)="logout()">Cerrar Sesión</a></li>
         </ul>        
     </aside>
 
@@ -16,7 +16,7 @@
     <section class="content">
         <header class="content-header">
             <h1>Solicitud de Transferencia</h1>
-            <button class="back-button">Main Page</button>
+            <button class="back-button" (click)="goToMainPage()">Main Page</button>
         </header>
 
         <!-- Formulario de transferencia -->
@@ -24,18 +24,16 @@
             <h2>Seleccionar Operador</h2>
             <div class="form-group">
                 <label for="operator-select">Operadores Disponibles:</label>
-                <select id="operator-select" class="operator-select">
+                <select id="operator-select" class="operator-select" [(ngModel)]="selectedOperator">
                     <option value="">Seleccionar Operador</option>
-                    <option value="operador1">Operador 1</option>
-                    <option value="operador2">Operador 2</option>
-                    <option value="operador3">Operador 3</option>
+                    <option *ngFor="let operator of operators" [value]="operator.id">{{ operator.name }}</option>
                 </select>
             </div>
         </section>
 
         <!-- Botón de Aceptar -->
         <div class="accept-button-container">
-            <button class="primary-button accept-button">Aceptar</button> <!-- Usamos primary-button aquí -->
+            <button class="primary-button accept-button" (click)="submitTransfer()" [disabled]="!selectedOperator">Aceptar</button>
         </div>
     </section>
 </div>
