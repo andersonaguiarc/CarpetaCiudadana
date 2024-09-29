@@ -51,7 +51,12 @@ const run = async () => {
         const connection = await amqp.connect(RABBITMQ_URL);
         channel = await connection.createChannel();
 
-        await channel.assertQueue(QUEUE_NAME, { durable: true });
+        await channel.assertQueue(QUEUE_NAME, {
+            durable: true
+            , arguments: {
+                'x-queue-type': 'classic'
+            }
+        });
         console.log(`Waiting for messages in queue: ${QUEUE_NAME}`);
 
         channel.consume(QUEUE_NAME, consumeMessage, { noAck: false });

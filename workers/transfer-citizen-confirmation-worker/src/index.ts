@@ -35,28 +35,26 @@ const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
                     channel.nack(msg, false, false);
                 });
 
-            channel.ack(msg);
         } catch (error) {
             console.log('Error in RabbitMQ consumer:', error);
             channel.nack(msg, false, false);
         }
-
-        channel.ack(msg);
-
-    } catch (error) {
-        console.log('Error in RabbitMQ consumer:', error);
-        channel.nack(msg, false, false);
-
     }
+
 }
-};
+
 
 const run = async () => {
     try {
         const connection = await amqp.connect(RABBITMQ_URL);
         channel = await connection.createChannel();
 
-        await channel.assertQueue(QUEUE_NAME, { durable: true });
+        await channel.assertQueue(QUEUE_NAME, {
+            durable: true
+            , arguments: {
+                'x-queue-type': 'classic'
+            }
+        });
         console.log(`Waiting for messages in queue: ${QUEUE_NAME}`);
 
         channel.consume(QUEUE_NAME, consumeMessage, { noAck: false });

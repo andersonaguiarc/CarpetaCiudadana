@@ -23,7 +23,7 @@ const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
             resetTimeout: 30000
         };
 
-        parsedMessage.notifyRegistrationToTransfers = true;
+        parsedMessage.notifyRegistrationToTransfers = !!parsedMessage.operatorUrl;
 
         const breaker = new CircuitBreaker(axios.post, options);
         await breaker.fire(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/register`, parsedMessage)
@@ -51,7 +51,12 @@ const run = async () => {
         const connection = await amqp.connect(RABBITMQ_URL);
         channel = await connection.createChannel();
 
-        await channel.assertQueue(QUEUE_NAME, { durable: true });
+        await channel.assertQueue(QUEUE_NAME, {
+            durable: true
+            , arguments: {
+                'x-queue-type': 'classic'
+            }
+        });
         console.log(`Waiting for messages in queue: ${QUEUE_NAME}`);
 
         channel.consume(QUEUE_NAME, consumeMessage, { noAck: false });
