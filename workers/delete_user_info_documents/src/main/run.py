@@ -38,13 +38,17 @@ def main():
     if not documents_url:
         raise ValueError("DOCUMENTS_URL environment variable is required.")
 
-    amqp_queue = os.getenv("AMQP_QUEUE")
+    amqp_queue = os.getenv("AMQP_DELETE_USER_DOCUMENTS_QUEUE")
     if not amqp_queue:
-        raise ValueError("AMQP_QUEUE environment variable is required.")
+        raise ValueError(
+            "AMQP_DELETE_USER_DOCUMENTS_QUEUE environment variable is required."
+        )
 
-    amqp_routing_key = os.getenv("AMQP_ROUTING_KEY")
+    amqp_routing_key = os.getenv("AMQP_DELETE_USER_FROM_ALL_SYSTEM_ROUTING_KEY")
     if not amqp_routing_key:
-        raise ValueError("AMQP_ROUTING_KEY environment variable is required.")
+        raise ValueError(
+            "AMQP_DELETE_USER_FROM_ALL_SYSTEM_ROUTING_KEY environment variable is required."
+        )
 
     consumer = Consumer(
         amqp_connection,
