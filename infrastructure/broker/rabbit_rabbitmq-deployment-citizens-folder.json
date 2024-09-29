@@ -106,6 +106,15 @@
             }
         },
         {
+            "name": "citizen_registered_transfers_replier",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "undefined"
+            }
+        },
+        {
             "name": "external_citizen_to_register",
             "vhost": "/",
             "durable": true,
@@ -239,6 +248,15 @@
             "arguments": {}
         },
         {
+            "name": "citizen_registered_transfers_replier",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
             "name": "delayed_citizen_to_delete_and_transfer_replier",
             "vhost": "/",
             "type": "direct",
@@ -333,6 +351,14 @@
     ],
     "bindings": [
         {
+            "source": "citizen_registered_transfers_replier",
+            "vhost": "/",
+            "destination": "citizen_registered_transfers_replier",
+            "destination_type": "queue",
+            "routing_key": "citizen_registered_transfers_replier",
+            "arguments": {}
+        },
+        {
             "source": "citizen_to_delete_and_transfer",
             "vhost": "/",
             "destination": "citizen_to_delete_and_transfer",
@@ -426,6 +452,14 @@
             "destination": "document_to_certificate",
             "destination_type": "queue",
             "routing_key": "document_to_certificate",
+            "arguments": {}
+        },
+        {
+            "source": "delete_user_from_all_system",
+            "vhost": "/",
+            "destination": "delete_user_from_documents",
+            "destination_type": "queue",
+            "routing_key": "delete_user_from_all_system",
             "arguments": {}
         },
         {
