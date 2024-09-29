@@ -4,3 +4,4 @@ services/auth/config/firebase/
 services/auth/manifests/test/auth-ms-secrets.yaml
 services/auth/config/firebase/service-account.json
 services/files/manifests/test/files-ms-secrets.yaml
+docker-compose.yml
