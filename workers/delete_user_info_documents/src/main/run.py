@@ -42,10 +42,15 @@ def main():
     if not amqp_queue:
         raise ValueError("AMQP_QUEUE environment variable is required.")
 
+    amqp_routing_key = os.getenv("AMQP_ROUTING_KEY")
+    if not amqp_routing_key:
+        raise ValueError("AMQP_QUEUE environment variable is required.")
+
     consumer = Consumer(
         amqp_connection,
         documents_url,
         amqp_queue,
+        amqp_routing_key,
     )
 
     consumer.consume()

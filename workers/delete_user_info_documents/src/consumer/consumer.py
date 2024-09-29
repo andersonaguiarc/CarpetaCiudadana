@@ -13,11 +13,13 @@ class Consumer:
         connection: pika.BlockingConnection,
         govcarpeta_url: str,
         queue_name: str,
+        routing_key: str,
     ) -> None:
         self.connection = connection
         self.channel = connection.channel()
         self.documents_url = govcarpeta_url
         self.queue_name = queue_name
+        self.routing_key = routing_key
 
     @circuit(failure_threshold=2)
     def remove_user(self, body: Dict) -> None:
@@ -50,7 +52,7 @@ class Consumer:
 
             self.channel.basic_publish(
                 exchange=f"delayed_{self.queue_name}",
-                routing_key=f"delayed_{self.queue_name}",
+                routing_key=f"delayed_{self.routing_key}",
                 body=message,
             )
 
