@@ -7,12 +7,21 @@ import pika
 from werkzeug.exceptions import BadRequest, Unauthorized
 from config import Config
 import util
+from circuitbreaker import circuit
 
 app = Flask(__name__)
+def ping():
+    return jsonify({"message": "This is working!", "path": "/api/info"}), 200
+app.add_url_rule(
+        "/api/info",
+        view_func=ping,
+        methods=["GET"],
+    )
+
 api = Api(app)
 
-# Función para enviar mensaje al exchange en RabbitMQ
-def send_to_rabbitmq(message):
+# Función para enviar mensaje al exchange citizen en RabbitMQ
+def send_to_rabbitmq_citizen(message):
     try:
         message = json.dumps(message)
         credentials = pika.PlainCredentials(Config.USER_RABBITMQ, Config.PASS_RABBITMQ)
@@ -21,9 +30,6 @@ def send_to_rabbitmq(message):
         connection = pika.BlockingConnection(pika.ConnectionParameters(
             host=Config.HOST_RABBITMQ, port=Config.PORT_RABBITMQ, credentials=credentials))
         channel = connection.channel()
-
-        # Declarar el exchange (direct o topic)
-        channel.exchange_declare(exchange=Config.EXCHANGE_NAME_TRANSER_TO_CITIZEN, exchange_type='direct', durable=True)
 
         # Publicar el mensaje en el exchange
         channel.basic_publish(exchange=Config.EXCHANGE_NAME_TRANSER_TO_CITIZEN, routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_CITIZEN, body=message)
@@ -37,7 +43,53 @@ def send_to_rabbitmq(message):
         print(f"Error al enviar el mensaje a RabbitMQ: {str(e)}")
 
 
+# Función para enviar mensaje al exchange citizen en RabbitMQ
+def send_to_rabbitmq_document(message):
+    try:
+        message = json.dumps(message)
+        credentials = pika.PlainCredentials(Config.USER_RABBITMQ, Config.PASS_RABBITMQ)
+
+        # Conexión a RabbitMQ
+        connection = pika.BlockingConnection(pika.ConnectionParameters(
+            host=Config.HOST_RABBITMQ, port=Config.PORT_RABBITMQ, credentials=credentials))
+        channel = connection.channel()
+
+        # Publicar el mensaje en el exchange
+        channel.basic_publish(exchange=Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT, routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT, body=message)
+
+        print(f"Mensaje enviado a RabbitMQ en el exchange '{Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT}': {message}")
+
+        # Cerrar la conexión
+        connection.close()
+
+    except Exception as e:
+        print(f"Error al enviar el mensaje a RabbitMQ: {str(e)}")
+
+
 class CitizensTransfer(Resource):
+    @circuit(failure_threshold=2)
+    def request_citizen(self, citizen_api_url, headers):
+        response = requests.patch(citizen_api_url, headers=headers)
+        response.raise_for_status()
+        return response
+
+    @circuit(failure_threshold=2)
+    def request_documents(self, documents_api_url, citizen_id):
+        response = requests.post(f"{documents_api_url}/api/v1/documents/files/{citizen_id}")
+
+        response.raise_for_status()
+        return response
+
+    @circuit(failure_threshold=2)
+    def request_third_party_operator(self, operator_url, documents_response, citizen_response):
+        response = requests.post(operator_url, json={
+                    **documents_response.json(),
+                    "citizenName": citizen_response.json()["name"],
+                    "citizenEmail": citizen_response.json()["email"]
+                })
+        response.raise_for_status()
+        return response
+
     def patch(self):
         try:
             # Verificar si el cuerpo de la petición contiene datos JSON
@@ -73,21 +125,34 @@ class CitizensTransfer(Resource):
             }
 
             # Realizar la petición PATCH al servicio Citizen
-            response = requests.patch(citizen_api_url, headers=headers)
-
-            # Verificar la respuesta del servicio de Citizen para continuar
-            if response.status_code == 200:
-                return {"message": f"El ciudadano {citizen_id} ha sido transferido al {operator_id} de forma exitosa."}, 200
-            else:
-                # Enviar el mensaje al exchange de RabbitMQ en caso de fallo
+            try: 
+                citizen_response = self.request_citizen(citizen_api_url, headers)
+            except Exception as err:
+                print(err, flush=True)
                 message = {
                     "userId": citizen_id,
                     "operatorUrl": operator_url
                 }
-                send_to_rabbitmq(message)
+                send_to_rabbitmq_citizen(message)
+                # Responder al consumidor que la transferencia está en proceso
+                return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
 
-                # Responder que la transferencia está en proceso
-                return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": response.text}, 200
+            # Obtener la URL del servicio Documents desde el archivo de configuración
+            documents_api_url = Config.DOCUMENT_API_URL
+            
+            try:
+                documents_response = self.request_documents(documents_api_url, citizen_id)
+            except Exception as err:
+                send_to_rabbitmq_document(citizen_response.json())
+                return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
+
+            try:
+                third_party_operator_response = self.request_third_party_operator(operator_url, documents_response, citizen_response)
+            except Exception as err:
+                send_to_rabbitmq_document(citizen_response.json())
+                return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
+
+            return {"message": f"El ciudadano {citizen_id} ha sido transferido al {operator_id} de forma exitosa."}, 200
 
         except BadRequest as e:
             return {"message": "Formato JSON inválido."}, 400
@@ -97,7 +162,7 @@ class CitizensTransfer(Resource):
             raise Unauthorized("Encabezado de autorización mal formado")
 
 
-# Nueva API para recibir el mensaje del worker y continuar el procesamiento
+# API para recibir el mensaje del worker y continuar el procesamiento en Documents
 class CitizensTransferContinueDocuments(Resource):
     def post(self):
         try:
@@ -111,6 +176,7 @@ class CitizensTransferContinueDocuments(Resource):
             operator_url = data['operator_url']
 
             # Aquí iría la lógica de procesamiento del documento con el servicio de Documents
+
             return {"message": f"Consulta exitosa de URL's para el operador {operator_url} para el ciudadano {citizen_id}"}, 200
 
             
@@ -141,6 +207,9 @@ class CitizensTransferContinueDocuments(Resource):
 # Rutas y recursos para las APIs
 api.add_resource(CitizensTransfer, '/transfers/api/citizens/transfer')
 api.add_resource(CitizensTransferContinueDocuments, '/transfers/api/citizens/transfer/continue/documents')
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
