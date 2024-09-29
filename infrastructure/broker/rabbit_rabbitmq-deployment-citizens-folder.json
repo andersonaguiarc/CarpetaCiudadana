@@ -28,6 +28,7 @@
             "name": "/",
             "description": "",
             "tags": [],
+            "default_queue_type": "undefined",
             "metadata": {
                 "description": "",
                 "tags": [],
@@ -93,6 +94,18 @@
             }
         },
         {
+            "name": "delayed_document_to_certificate",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-dead-letter-exchange": "delayed_document_to_certificate",
+                "x-dead-letter-routing-key": "document_to_certificate",
+                "x-message-ttl": 60000,
+                "x-queue-type": "undefined"
+            }
+        },
+        {
             "name": "external_citizen_to_register",
             "vhost": "/",
             "durable": true,
@@ -136,7 +149,8 @@
             "arguments": {
                 "x-dead-letter-exchange": "delayed_citizen_to_delete_and_transfer",
                 "x-dead-letter-routing-key": "citizen_to_delete_and_transfer",
-                "x-message-ttl": 60000
+                "x-message-ttl": 60000,
+                "x-queue-type": "undefined"
             }
         },
         {
@@ -146,6 +160,15 @@
             "auto_delete": false,
             "arguments": {
                 "x-queue-type": "classic"
+            }
+        },
+        {
+            "name": "document_to_certificate",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "undefined"
             }
         },
         {
@@ -181,6 +204,15 @@
     "exchanges": [
         {
             "name": "delayed_citizen_to_register",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "delayed_document_to_certificate",
             "vhost": "/",
             "type": "direct",
             "durable": true,
@@ -226,6 +258,15 @@
         },
         {
             "name": "citizen_to_delete_and_transfer",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "document_to_certificate",
             "vhost": "/",
             "type": "direct",
             "durable": true,
@@ -372,6 +413,22 @@
             "arguments": {}
         },
         {
+            "source": "delayed_document_to_certificate",
+            "vhost": "/",
+            "destination": "delayed_document_to_certificate",
+            "destination_type": "queue",
+            "routing_key": "delayed_document_to_certificate",
+            "arguments": {}
+        },
+        {
+            "source": "delayed_document_to_certificate",
+            "vhost": "/",
+            "destination": "document_to_certificate",
+            "destination_type": "queue",
+            "routing_key": "document_to_certificate",
+            "arguments": {}
+        },
+        {
             "source": "delete_user_from_all_system",
             "vhost": "/",
             "destination": "delete_user_from_auth",
@@ -385,6 +442,14 @@
             "destination": "delete_user_from_auth",
             "destination_type": "queue",
             "routing_key": "delete_user_from_auth",
+            "arguments": {}
+        },
+        {
+            "source": "document_to_certificate",
+            "vhost": "/",
+            "destination": "document_to_certificate",
+            "destination_type": "queue",
+            "routing_key": "document_to_certificate",
             "arguments": {}
         },
         {

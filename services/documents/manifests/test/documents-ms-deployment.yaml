@@ -45,24 +45,19 @@ spec:
             path: /api/info
             port: 8400
 
-      #- name: transfer-citizen-confirmation-processor
-      #  image: spbpatino/citizens-folder-transfer-citizen-confirm-worker:latest
-      #  imagePullPolicy: Always
-      #  resources:
-      #    requests:
-      #      cpu: "50m"
-      #      memory: "128Mi"
-      #    limits:
-      #      cpu: "500m"
-      #      memory: "512Mi"
-      #
-      #- name: delete-transfer-citizen-processor
-      #  image: spbpatino/citizens-folder-delete-transfer-citizen-worker:latest
-      #  imagePullPolicy: Always
-      #  resources:
-      #    requests:
-      #      cpu: "50m"
-      #      memory: "128Mi"
-      #    limits:
-      #      cpu: "500m"
-      #      memory: "512Mi"
+      - name: documents-to-certificate-processor
+        image: spbpatino/citizens-folder-documents-to-certificate-worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: documents-api
+        - secretRef:
+            name: documents-api
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+

@@ -48,7 +48,14 @@ class Consumer:
             self.certify(body)
         except Exception as e:
             print(f"Error: {e}")
-            ch.basic_nack(delivery_tag=method.delivery_tag)
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False, multiple=False)
+
+            self.channel.basic_publish(
+                exchange=f"delayed_{self.queue_name}",
+                routing_key=f"delayed_{self.queue_name}",
+                body=message,
+            )
+
         else:
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
