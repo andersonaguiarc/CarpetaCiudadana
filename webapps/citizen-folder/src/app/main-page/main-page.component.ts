@@ -11,7 +11,7 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class MainPageComponent implements OnInit {
   documents: any[] = []; // Lista de documentos cargados
-  apiUrl: string = '/api/documents/api/documents'; // API para listar documentos
+  apiUrl: string = 'http://api.fastidentify.com/documents/api/documents'; // API para listar documentos
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router) { }
 
