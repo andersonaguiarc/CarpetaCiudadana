@@ -14,6 +14,12 @@ from typing import List, Dict
 import json
 
 
+class DocumentStatus:
+    CREATED = "created"
+    CERTIFYING = "certifying"
+    CERTIFIED = "certified"
+
+
 class Handler:
 
     def __init__(
@@ -35,7 +41,6 @@ class Handler:
 
     @circuit(failure_threshold=2)
     def certify(self, response, user_id, file_name):
-        raise Exception("Not implemented")
         govcarpeta_response = requests.put(
             f"{self.govcarpeta_url}/apis/authenticateDocument",
             json={
@@ -49,7 +54,7 @@ class Handler:
             {"_id": f"{user_id}/{file_name}"},
             {
                 "$set": {
-                    "certified": True,
+                    "status": DocumentStatus.CERTIFIED,
                 }
             },
         )
@@ -84,6 +89,14 @@ class Handler:
                 exchange=self.amqp_exchange,
                 routing_key=self.amqp_routing_key,
                 body=message,
+            )
+            self.documents.update_one(
+                {"_id": f"{user_id}/{file_name}"},
+                {
+                    "$set": {
+                        "status": DocumentStatus.CERTIFYING,
+                    }
+                },
             )
 
         try:
@@ -127,7 +140,7 @@ class Handler:
                 },
                 {
                     "$set": {
-                        "certified": True,
+                        "status": DocumentStatus.CERTIFIED,
                     }
                 },
             )
@@ -156,7 +169,7 @@ class Handler:
             "user_id": user_id,
             "last_modified": datetime.datetime.now(),
             "size": len(data),
-            "certified": False,
+            "status": DocumentStatus.CREATED,
         }
 
         try:
@@ -314,7 +327,7 @@ class Handler:
                 "user_id": user_id,
                 "last_modified": datetime.datetime.now(),
                 "size": len(data),
-                "certified": False,
+                "status": DocumentStatus.CREATED,
             }
             if self._document_exists(path, user_id):
                 self.documents.update_one(
