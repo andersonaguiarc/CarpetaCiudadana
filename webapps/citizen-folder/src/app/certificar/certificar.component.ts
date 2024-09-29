@@ -41,7 +41,7 @@ export class CertificarComponent implements OnInit {
         next: (response) => {
           if (response.results) {
             this.documents = response.results.map((doc: any) => ({
-              name: doc._id,
+              name: doc.path,
               size: (doc.size / 1024).toFixed(2), // Convertimos el tamaño de bytes a KB
               modified: doc.last_modified, // Usamos la fecha de modificación del documento
               path: doc.path // Usamos este campo para operaciones futuras si es necesario
