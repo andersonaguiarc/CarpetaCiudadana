@@ -50,6 +50,11 @@ def create_app(handler):
     base_path = "/api/v1/documents"
 
     app.add_url_rule(
+        f"{base_path}/certify/internal/",
+        view_func=handler.certify_internal,
+        methods=["POST"],
+    )
+    app.add_url_rule(
         f"{base_path}/certify/<path:file_name>",
         view_func=handler.certify_document,
         methods=["POST"],

@@ -34,9 +34,9 @@ def main():
     """Main entry point for the application."""
     amqp_connection = create_amqp_connection()
 
-    govcarpeta_url = os.getenv("GOVCARPETA_URL")
-    if not govcarpeta_url:
-        raise ValueError("GOVCARPETA_URL environment variable is required.")
+    documents_url = os.getenv("DOCUMENTS_URL")
+    if not documents_url:
+        raise ValueError("DOCUMENTS_URL environment variable is required.")
 
     amqp_queue = os.getenv("AMQP_QUEUE")
     if not amqp_queue:
@@ -44,7 +44,7 @@ def main():
 
     consumer = Consumer(
         amqp_connection,
-        govcarpeta_url,
+        documents_url,
         amqp_queue,
     )
 

@@ -35,6 +35,7 @@ class Handler:
 
     @circuit(failure_threshold=2)
     def certify(self, response, user_id, file_name):
+        raise Exception("Not implemented")
         govcarpeta_response = requests.put(
             f"{self.govcarpeta_url}/apis/authenticateDocument",
             json={
@@ -44,6 +45,14 @@ class Handler:
             },
         )
         govcarpeta_response.raise_for_status()
+        self.documents.update_one(
+            {"_id": f"{user_id}/{file_name}"},
+            {
+                "$set": {
+                    "certified": True,
+                }
+            },
+        )
         print(govcarpeta_response.json(), flush=True)
 
     @token_required
@@ -91,6 +100,46 @@ class Handler:
         # except Exception as err:
         return jsonify({"message": "document certification in progress"}), 200
 
+    def certify_internal(self):
+
+        try:
+            data = request.get_json()
+
+            class CertificationRequest(BaseModel):
+                idCitizen: int
+                UrlDocument: str
+                documentTitle: str
+
+            certification_request = CertificationRequest(**data)
+
+            govcarpeta_response = requests.put(
+                f"{self.govcarpeta_url}/apis/authenticateDocument",
+                json={
+                    "idCitizen": certification_request.idCitizen,
+                    "UrlDocument": certification_request.UrlDocument,
+                    "documentTitle": certification_request.documentTitle,
+                },
+            )
+            govcarpeta_response.raise_for_status()
+            self.documents.update_one(
+                {
+                    "_id": f"{certification_request.idCitizen}/{certification_request.documentTitle}"
+                },
+                {
+                    "$set": {
+                        "certified": True,
+                    }
+                },
+            )
+            print(
+                f"Certified document: {govcarpeta_response.json()}",
+                flush=True,
+            )
+            return jsonify({"message": "document certification successful"}), 200
+        except Exception as err:
+            print(err, flush=True)
+            return jsonify({"error": "internal server error"}), 500
+
     @token_required
     def create_document(self, file_name):
 
@@ -107,6 +156,7 @@ class Handler:
             "user_id": user_id,
             "last_modified": datetime.datetime.now(),
             "size": len(data),
+            "certified": False,
         }
 
         try:
@@ -264,6 +314,7 @@ class Handler:
                 "user_id": user_id,
                 "last_modified": datetime.datetime.now(),
                 "size": len(data),
+                "certified": False,
             }
             if self._document_exists(path, user_id):
                 self.documents.update_one(

@@ -11,18 +11,18 @@ class Consumer:
     def __init__(
         self,
         connection: pika.BlockingConnection,
-        govcarpeta_url: str,
+        documents_url: str,
         queue_name: str,
     ) -> None:
         self.connection = connection
         self.channel = connection.channel()
-        self.govcarpeta_url = govcarpeta_url
+        self.documents_url = documents_url
         self.queue_name = queue_name
 
     @circuit(failure_threshold=2)
     def certify(self, body: Dict) -> None:
-        govcarpeta_response = requests.put(
-            f"{self.govcarpeta_url}/apis/authenticateDocument",
+        govcarpeta_response = requests.post(
+            f"{self.documents_url}/api/v1/documents/certify/internal/",
             json={
                 "idCitizen": body["user_id"],
                 "UrlDocument": body["url"],
@@ -48,7 +48,11 @@ class Consumer:
             self.certify(body)
         except Exception as e:
             print(f"Error: {e}")
-            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False, multiple=False)
+            ch.basic_nack(
+                delivery_tag=method.delivery_tag,
+                requeue=False,
+                multiple=False,
+            )
 
             self.channel.basic_publish(
                 exchange=f"delayed_{self.queue_name}",
