@@ -211,12 +211,21 @@ class Handler:
 
             results = list(map(lambda x: x["_id"], documents))
             body = {"paths": results}
-            response = requests.post(
+            files_response = requests.post(
                 f"{self.files_url}/api/v1/files/sign_all_url/",
                 json=body,
             )
 
-            return make_response(response.json(), 201)
+            files_json = files_response.json()
+
+            all_files_response = {
+                "id": user_id,
+                "Documents": {
+                    result["path"]: [result["url"]] for result in files_json["results"]
+                },
+            }
+
+            return make_response(all_files_response, 201)
         except Exception as err:
             print(err, flush=True)
             return jsonify({"error": "internal server error"}), 500
