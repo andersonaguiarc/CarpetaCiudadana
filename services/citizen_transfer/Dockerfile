@@ -10,4 +10,6 @@ COPY . .
 
 ENV PYTHONPATH "/app"
 
+EXPOSE 8450
+
 CMD ["python3", "src/main/citizen_transfers.py"]

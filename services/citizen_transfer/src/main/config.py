@@ -18,3 +18,4 @@ class Config:
     PORT_RABBITMQ = os.getenv('PORT_RABBITMQ')
     USER_RABBITMQ = os.getenv('USER_RABBITMQ')
     PASS_RABBITMQ = os.getenv('PASS_RABBITMQ')
+    PORT = int(os.getenv('PORT'))

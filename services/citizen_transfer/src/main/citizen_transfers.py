@@ -189,7 +189,8 @@ class CitizensTransferContinueDocuments(Resource):
 class Heartbeat(Resource):
     def get(self):
         try:
-            return {"status": "ok", "message": "Service is running"}, 200
+            print("Heartbeat")
+            return {"message": "This is working!","path": "/api/info"}, 200
         except Exception as e:
             return {"status": "error", "message": str(e)}, 500
 
@@ -200,4 +201,4 @@ api.add_resource(CitizensTransferContinueDocuments, '/transfers/api/citizens/tra
 api.add_resource(Heartbeat, '/api/info')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=int(getenv('PORT', '5000')))
+    app.run(host='0.0.0.0', debug=True, port=Config.PORT)
