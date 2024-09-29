@@ -6,8 +6,8 @@ metadata:
 spec:
   virtualhost:
     fqdn: api.fastidentify.com
-    #tls:
-    #  secretName: api-ambassador-tls
+    tls:
+      secretName: api-fastidentify-tls
     corsPolicy:
         allowCredentials: true
         allowOrigin:

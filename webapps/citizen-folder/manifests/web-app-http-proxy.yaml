@@ -5,10 +5,13 @@ metadata:
   namespace: citizens-folder
 spec:
   virtualhost:
-    fqdn: fastidentify.com 
-    #tls:
-    #  secretName: ambassador-tls
+    fqdn: fastidentify.com
+    tls:
+      secretName: citizens-folder-tls
   routes:
     - conditions:
       - prefix: /
+      services:
+        - name: web-app  # Asegúrate de que este servicio exista y esté correctamente configurado
+          port: 80
       

@@ -6,8 +6,8 @@ metadata:
 spec:
   virtualhost:
     fqdn: fastidentify.com
-    #tls:
-    #  secretName: store-ambassador-tls
+    tls:
+      secretName: citizens-folder-tls
   routes:
     - conditions:
       - prefix: /

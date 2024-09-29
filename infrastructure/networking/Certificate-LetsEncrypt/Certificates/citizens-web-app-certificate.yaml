@@ -1,12 +1,12 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: store-ambassador-tls
+  name: citizens-folder-tls
 spec:
-  commonName: store.ambassadors.ink
+  commonName: fastidentify.com
   dnsNames:
-  - store.ambassadors.ink
+  - fastidentify.com
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  secretName: store-ambassador-tls
+  secretName: citizens-folder-tls

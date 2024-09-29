@@ -18,7 +18,7 @@ spec:
         image: spbpatino/citizens-folder-web-app:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 4000
+        - containerPort: 80
         resources:
           requests:
             cpu: "50m"
