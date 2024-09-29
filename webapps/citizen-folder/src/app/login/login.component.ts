@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +16,7 @@ export class LoginComponent {
   apiUrl: string = '/api/auth/api/citizens/login';
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private fb: FormBuilder,
     private http: HttpClient,
     private router: Router
@@ -38,7 +41,7 @@ export class LoginComponent {
     this.http.post<any>(this.apiUrl, loginData).
       subscribe({
       next :(response) => {
-        if (response && response.token) {
+        if (response && response.token && isPlatformBrowser(this.platformId)) {
           // Guardar el token en sessionStorage
           sessionStorage.setItem('token', response.token);
           console.log(response.token);

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http'; // Importamos HttpClient para hacer la solicitud a la API
 import { Router } from '@angular/router';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-main-page',
@@ -11,7 +13,7 @@ export class MainPageComponent implements OnInit {
   documents: any[] = []; // Lista de documentos cargados
   apiUrl: string = '/api/documents/api/documents'; // API para listar documentos
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
     this.verifyToken(); // Verificar el token antes de cargar los documentos
@@ -20,8 +22,10 @@ export class MainPageComponent implements OnInit {
 
   // Método para verificar el JWT en sessionStorage
   verifyToken(): void {
-    const token = sessionStorage.getItem('token');
-
+    let token = null;
+    if (isPlatformBrowser(this.platformId)) {
+      token = sessionStorage.getItem('token');
+    }
     if (!token) {
       // Si no hay token en sessionStorage, redirigir al login
       this.router.navigate(['/login']);
@@ -30,8 +34,10 @@ export class MainPageComponent implements OnInit {
 
   // Método para cargar documentos desde la API
   loadDocuments(): void {
-    const token = sessionStorage.getItem('token'); // Obtener el token de sessionStorage
-
+    let token = null;
+    if (isPlatformBrowser(this.platformId)) {
+      token = sessionStorage.getItem('token'); // Obtener el token de sessionStorage
+    }
     if (token) {
       this.http.get<any>(this.apiUrl, {
         headers: {

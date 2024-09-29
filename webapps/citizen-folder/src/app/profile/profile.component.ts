@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
@@ -10,7 +12,7 @@ import { Router } from '@angular/router';
 export class ProfileComponent implements OnInit {
   user: any = {}; // Detalles del usuario
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
     this.verifyToken(); // Verificar el token antes de cargar el perfil
@@ -18,7 +20,10 @@ export class ProfileComponent implements OnInit {
   }
 
   verifyToken(): void {
-    const token = sessionStorage.getItem('token');
+    let token = null;
+    if (isPlatformBrowser(this.platformId)) {
+      token = sessionStorage.getItem('token');
+    }
     if (!token) {
       // Si no hay token, redirigir al login
       this.router.navigate(['/login']);
@@ -26,7 +31,10 @@ export class ProfileComponent implements OnInit {
   }
 
   loadUserProfile(): void {
-    const token = sessionStorage.getItem('token');
+    let token = null;
+    if (isPlatformBrowser(this.platformId)) {
+      token = sessionStorage.getItem('token');
+    }
     if (token) {
       // Cargar los detalles del perfil desde la API
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);

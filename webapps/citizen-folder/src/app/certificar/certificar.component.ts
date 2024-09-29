@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http'; // Importamos HttpClient para hacer la solicitud a la API
 import { Router } from '@angular/router';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-certificar',
@@ -12,7 +14,7 @@ export class CertificarComponent implements OnInit {
   selectedDocument: any = null; // Documento seleccionado
   apiUrl: string = '/api/documents/api/documents'; // API para listar documentos
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
     this.verifyToken(); // Verificar el token antes de cargar los documentos
@@ -20,7 +22,10 @@ export class CertificarComponent implements OnInit {
   }
 
   verifyToken(): void {
-    const token = sessionStorage.getItem('token');
+    let token = null;
+    if (isPlatformBrowser(this.platformId)) {
+      token = sessionStorage.getItem('token');
+    }
 
     if (!token) {
       // Si no hay token en sessionStorage, redirigir al login
@@ -30,8 +35,10 @@ export class CertificarComponent implements OnInit {
 
   // Método para cargar documentos desde la API
   loadDocuments(): void {
-    const token = sessionStorage.getItem('token'); // Obtener el token de sessionStorage
-
+    let token = null;
+    if (isPlatformBrowser(this.platformId)) {
+      token = sessionStorage.getItem('token'); // Obtener el token de sessionStorage
+    }
     if (token) {
       this.http.get<any>(this.apiUrl, {
         headers: {
@@ -53,7 +60,7 @@ export class CertificarComponent implements OnInit {
         error: (error) => {
           console.error('Error al cargar los documentos:', error);
         }
-    });
+      });
     } else {
       console.error('No se encontró token');
       this.router.navigate(['/login']); // Redirigir si no hay token
@@ -76,30 +83,30 @@ export class CertificarComponent implements OnInit {
       console.log('Certificando el documento:', this.selectedDocument);
       const slug = this.selectedDocument.path; // Usamos el path del documento como identificador
       const token = sessionStorage.getItem('token');
-  
+
       if (!token) {
         alert('No hay token disponible. Inicia sesión nuevamente.');
         this.router.navigate(['/login']);
         return;
       }
-  
+
       const apiUrlC = `/api/documents/api/documents/certify/${slug}`; // URL de la API para certificar el documento
-  
+
       // Hacemos la solicitud POST a la API
       this.http.post(apiUrlC, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       }).subscribe({
-       next: (response) => {
-        console.log('Documento certificado exitosamente:', response);
-        alert('El documento ha sido certificado exitosamente.');
-      },
-       error: (error) => {
+        next: (response) => {
+          console.log('Documento certificado exitosamente:', response);
+          alert('El documento ha sido certificado exitosamente.');
+        },
+        error: (error) => {
           console.error('Error al certificar el documento:', error);
           alert('Hubo un error al certificar el documento. Inténtalo nuevamente.');
         }
-    });
+      });
     } else {
       alert('Debes seleccionar un documento para certificar.');
     }

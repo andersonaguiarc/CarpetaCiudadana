@@ -1,0 +1,16 @@
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: web-app
+  namespace: citizens-folder
+spec:
+  virtualhost:
+    fqdn: fastidentify.com
+    #tls:
+    #  secretName: store-ambassador-tls
+  routes:
+    - conditions:
+      - prefix: /
+      services:
+        - name: web-app
+          port: 80
