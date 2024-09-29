@@ -1,6 +1,7 @@
 import * as amqp from 'amqplib';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { publishMessage } from './rabbitmq/config';
 const CircuitBreaker = require("opossum");
 dotenv.config();
 
@@ -29,9 +30,14 @@ const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
                 channel.ack(msg);
 
             })
-            .catch(function (error) {
+            .catch(await async function (error) {
                 console.log('Failed to register user', error.response.data);
                 channel.nack(msg, false, false);
+
+                const DELAYED_QUEUE_NAME = 'delayed_citizen_to_register';
+
+                await publishMessage(DELAYED_QUEUE_NAME, 'direct', DELAYED_QUEUE_NAME, messageContent);
+
             });
 
 
