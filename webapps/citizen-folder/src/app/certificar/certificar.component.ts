@@ -12,7 +12,7 @@ import { isPlatformBrowser } from '@angular/common';
 export class CertificarComponent implements OnInit {
   documents: any[] = []; // Lista de documentos cargados
   selectedDocument: any = null; // Documento seleccionado
-  apiUrl: string = '/api/documents/api/documents'; // API para listar documentos
+  apiUrl: string = 'http://api.fastidentify.com/documents/api/documents'; // API para listar documentos
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router) { }
 
@@ -90,7 +90,7 @@ export class CertificarComponent implements OnInit {
         return;
       }
 
-      const apiUrlC = `/api/documents/api/documents/certify/${slug}`; // URL de la API para certificar el documento
+      const apiUrlC = `http://api.fastidentify.com/documents/api/documents/certify/${slug}`; // URL de la API para certificar el documento
 
       // Hacemos la solicitud POST a la API
       this.http.post(apiUrlC, {}, {

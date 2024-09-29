@@ -10,8 +10,8 @@ import { Router } from '@angular/router';
 export class TransferenciaComponent implements OnInit {
   operators: any[] = [];
   selectedOperator: string = '';
-  apiUrlOperators: string = '/api/operators/api/operators'; // API para obtener operadores
-  apiUrlTransfer: string = '/users/api/citizens/transfer'; // API para hacer la transferencia
+  apiUrlOperators: string = 'http://api.fastidentify.com/operators/api/operators'; // API para obtener operadores
+  apiUrlTransfer: string = 'http://api.fastidentify.com/users/api/citizens/transfer'; // API para hacer la transferencia
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -63,7 +63,7 @@ export class TransferenciaComponent implements OnInit {
 
     if (token) {
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-      this.http.post(this.apiUrlTransfer, body, { headers }).subscribe({
+      this.http.patch(this.apiUrlTransfer, body, { headers }).subscribe({
         next: (response) => {
           alert('Transferencia realizada con éxito.');
           this.router.navigate(['/proceso-transferencia']); // Redirigir a pantalla de confirmación
