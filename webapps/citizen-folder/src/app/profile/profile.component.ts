@@ -38,7 +38,7 @@ export class ProfileComponent implements OnInit {
     if (token) {
       // Cargar los detalles del perfil desde la API
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-      this.http.get<any>('http://api.fastidentify.com/users/api/citizens/user', { headers }).subscribe({
+      this.http.get<any>('https://api.fastidentify.com/users/api/citizens/user', { headers }).subscribe({
         next: (response) => {
           this.user = response;
         },

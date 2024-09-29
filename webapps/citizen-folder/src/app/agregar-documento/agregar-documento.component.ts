@@ -59,7 +59,7 @@ export class AgregarDocumentoComponent {
       });
 
       // Enviar el archivo binario directamente en el cuerpo de la solicitud
-      this.http.post(`http://api.fastidentify.com/documents/api/documents/${this.fileSlug}`, fileContents, { headers })
+      this.http.post(`https://api.fastidentify.com/documents/api/documents/${this.fileSlug}`, fileContents, { headers })
         .subscribe(
           (response) => {
             console.log('Archivo subido exitosamente:', response);
@@ -121,6 +121,6 @@ export class AgregarDocumentoComponent {
 
   logout(): void {
     sessionStorage.removeItem('token');
-    this.router?.navigate(['/login']);
+    this.router.navigate(['/login']);
   }
 }

@@ -49,7 +49,7 @@ export class RegisterComponent {
     }
 
     // Realizar la solicitud POST usando el proxy
-    this.http.post('http://api.fastidentify.com/registration-exp/api/citizens/registrations', formData)
+    this.http.post('https://api.fastidentify.com/registration-exp/api/citizens/registrations', formData)
     .subscribe({
       next: (response) => {
         console.log('Usuario registrado con éxito', response); 

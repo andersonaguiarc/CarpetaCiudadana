@@ -13,7 +13,7 @@ import { isPlatformBrowser } from '@angular/common';
 export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
-  apiUrl: string = 'http://api.fastidentify.com/auth/api/citizens/login';
+  apiUrl: string = 'https://api.fastidentify.com/auth/api/citizens/login';
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,

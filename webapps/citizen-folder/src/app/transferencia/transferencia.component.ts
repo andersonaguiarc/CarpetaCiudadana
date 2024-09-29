@@ -10,8 +10,8 @@ import { Router } from '@angular/router';
 export class TransferenciaComponent implements OnInit {
   operators: any[] = [];
   selectedOperator: string = '';
-  apiUrlOperators: string = 'http://api.fastidentify.com/operators/api/operators'; // API para obtener operadores
-  apiUrlTransfer: string = 'http://api.fastidentify.com/users/api/citizens/transfer'; // API para hacer la transferencia
+  apiUrlOperators: string = 'https://api.fastidentify.com/operators/api/operators'; // API para obtener operadores
+  apiUrlTransfer: string = 'https://api.fastidentify.com/transfer/citizens/transfer'; // API para hacer la transferencia
 
   constructor(private http: HttpClient, private router: Router) {}
 
