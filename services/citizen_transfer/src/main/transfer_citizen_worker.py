@@ -13,10 +13,7 @@ def callback(ch, method, properties, body):
 
         # Preparar la solicitud para el servicio CitizensTransfer
         citizens_transfer_url = f"{Config.CITIZEN_TRANSFER_API_URL}/continue/documents"
-        payload = {
-            "citizen_id": citizen_id,
-            "operator_url": operator_url
-        }
+        payload = message
 
         # Enviar el mensaje al servicio CitizensTransfer para continuar el procesamiento
         response = requests.post(citizens_transfer_url, json=payload)
