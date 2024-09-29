@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-agregar-documento',
@@ -12,7 +14,23 @@ export class AgregarDocumentoComponent {
   fileSlug: string = '';
   isFileLoaded: boolean = false;  // Indicador de que el archivo fue cargado
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router) { }
+  
+  ngOnInit(): void {
+    this.verifyToken(); // Verificar el token antes de cargar los documentos
+  }
+
+  verifyToken(): void {
+    let token = null;
+    if (isPlatformBrowser(this.platformId)) {
+      token = sessionStorage.getItem('token');
+    }
+
+    if (!token) {
+      // Si no hay token en sessionStorage, redirigir al login
+      this.router.navigate(['/login']);
+    }
+  }
 
   // Método para manejar la selección del archivo
   onFileSelect(event: any): void {
@@ -108,15 +126,15 @@ export class AgregarDocumentoComponent {
 
   // Navegación
   goToDocuments(): void {
-    this.router?.navigate(['/main-page']);
+    this.router.navigate(['/main-page']);
   }
 
   goToCertificar(): void {
-    this.router?.navigate(['/certificar']);
+    this.router.navigate(['/certificar']);
   }
 
   goToProfile(): void {
-    this.router?.navigate(['/profile']);
+    this.router.navigate(['/profile']);
   }
 
   logout(): void {
