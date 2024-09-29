@@ -5,9 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:ssr": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "build:ssr": "ng build --configuration=production && ng run miCarpeta:server:production",
+    
     "serve:ssr:citizen_folder": "node dist/citizen_folder/server/server.mjs"
   },
   "private": true,

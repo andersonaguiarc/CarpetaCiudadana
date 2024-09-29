@@ -69,13 +69,10 @@
           },
           "defaultConfiguration": "production"
         },
-        "server": {
-          "builder": "@angular-devkit/build-angular:server",
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "proxyConfig": "src/proxy.conf.json",
-            "outputPath": "dist/mi-carpeta/server",
-            "main": "src/main.server.ts",
-            "tsConfig": "tsconfig.server.json"
+            "proxyConfig": "src/proxy.conf.json"
           },
           "configurations": {
             "production": {
