@@ -24,6 +24,8 @@ export const Register = async (req: Request, res: Response) => {
             email
         });
 
+        const requestFromTransfers = !!req.body.notifyRegistrationToTransfers;
+
         const userToRegister = {
             id: req.body.id
             , name: req.body.name
@@ -84,7 +86,7 @@ export const Register = async (req: Request, res: Response) => {
                     , email: userToRegister.email
                 });
 
-                await publishMessage('delete_user_from_auth', 'direct', 'delete_user_from_auth', value);
+                if(!requestFromTransfers) await publishMessage('delete_user_from_auth', 'direct', 'delete_user_from_auth', value);
 
                 res.status(501).json({
                     errorCode: 'FAILED_TO_REGISTER_USER_TO_GOV_CARPETA'
@@ -94,12 +96,17 @@ export const Register = async (req: Request, res: Response) => {
 
             });
 
-        if (!canCreateUserRegistration) return;
+        if (!canCreateUserRegistration) {
+            res.status(501).json({
+                errorCode: 'FAILED_TO_REGISTER_USER'
+            });
+            return;
+        };
 
         const user = await getRepository(Citizen).save(userToRegister);
 
         const userToSend = {
-            user
+            user: { ...user }
             , syncType: SYNCTYPE.creation
         }
 
@@ -111,6 +118,14 @@ export const Register = async (req: Request, res: Response) => {
         const ROUTING_KEY = 'citizen_to_update';
 
         await publishMessage(EXCHANGE_NAME, EXCHANGE_TYPE, ROUTING_KEY, value);
+
+        if (requestFromTransfers && req.body.operatorUrl) {
+            const EXCHANGE_NAME_TRANSFERS_REPLIER = 'citizen_registered_transfers_replier';
+            const ROUTING_KEY_TRANSFERS_REPLIER = 'citizen_registered_transfers_replier';
+            const userCreated = { ...user };
+            userCreated['operatorUrl'] = req.body.operatorUrl;
+            await publishMessage(EXCHANGE_NAME_TRANSFERS_REPLIER, 'direct', ROUTING_KEY_TRANSFERS_REPLIER, JSON.stringify(userCreated));
+        }
 
         res.send(user);
 

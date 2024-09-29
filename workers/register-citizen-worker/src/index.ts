@@ -23,6 +23,8 @@ const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
             resetTimeout: 30000
         };
 
+        parsedMessage.notifyRegistrationToTransfers = true;
+
         const breaker = new CircuitBreaker(axios.post, options);
         await breaker.fire(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/register`, parsedMessage)
             .then(function (response) {
