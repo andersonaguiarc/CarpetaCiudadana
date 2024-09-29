@@ -52,7 +52,7 @@ class Consumer:
 
             self.channel.basic_publish(
                 exchange=f"delayed_{self.queue_name}",
-                routing_key=f"delayed_{self.routing_key}",
+                routing_key=self.routing_key,
                 body=message,
             )
 
