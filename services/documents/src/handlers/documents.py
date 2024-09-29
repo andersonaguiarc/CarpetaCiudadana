@@ -370,7 +370,7 @@ class Handler:
     def delete_all_documents(self, user_id):
 
         query = {
-            "user_id": user_id,
+            "user_id": int(user_id),
         }
 
         try:
