@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: citizens-transfer-api
+  namespace: citizens-folder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: citizens-transfer-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: citizens-transfer-api
+    spec:
+      containers:
+      - name: citizens-transfer-api
+        image: spbpatino/citizens-folder-citizen-transfer:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: citizens-transfer-api
+        - secretRef:
+            name: citizens-transfer-api
+        ports:
+        - containerPort: 8450
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /api/info
+            port: 8450
+        livenessProbe:
+          httpGet:
+            path: /api/info
+            port: 8450
+
+     #- name: citizens-transfer-to-certificate-processor
+     #  image: spbpatino/citizens-folder-citizens-transfer-to-certificate-worker:latest
+     #  imagePullPolicy: Always
+     #  envFrom:
+     #  - configMapRef:
+     #      name: citizens-transfer-api
+     #  - secretRef:
+     #      name: citizens-transfer-api
+     #  resources:
+     #    requests:
+     #      cpu: "50m"
+     #      memory: "128Mi"
+     #    limits:
+     #      cpu: "500m"
+     #      memory: "512Mi"
+

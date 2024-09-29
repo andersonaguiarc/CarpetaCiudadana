@@ -10,3 +10,4 @@ COPY . .
 
 ENV PYTHONPATH "/app"
 
+CMD ["python3", "src/main/citizen_transfers.py"]
