@@ -5,12 +5,14 @@ metadata:
   namespace: citizens-folder
 data:
   CORS_ORIGINS: localhost,*
-  AMQP_HOST: production-rabbitmqcluster.rabbitmq-system.svc.cluster.local
+  HOST_RABBITMQ: production-rabbitmqcluster.rabbitmq-system.svc.cluster.local
+  PORT_RABBITMQ: "5672"
   PORT: "8450"
-  #FILES_URL: http://files-api
-  #GOVCARPETA_URL: https://govcarpeta-apis-83e1c996379d.herokuapp.com
-  #AMQP_QUEUE: document_to_certificate
-  #AMQP_EXCHANGE: document_to_certificate
-  #AMQP_ROUTING_KEY: document_to_certificate
-  #AMQP_PORT: "5672"
-
+  EXCHANGE_NAME_TRANSER_TO_CITIZEN: citizen_to_delete_and_transfer
+  ROUTINGKEY_NAME_TRANSFER_TO_CITIZEN: citizen_to_delete_and_transfer
+  EXCHANGE_NAME_TRANSER_TO_DOCUMENT: delayed_citizen_to_delete_and_transfer_replier
+  ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT: delayed_citizen_to_delete_and_transfer_replier
+  QUEUE_NAME_CITIZEN_TO_TRANSFER_REPLIER: citizen_to_delete_and_transfer_replier
+  CITIZEN_API_URL: http://users-api
+  DOCUMENT_API_URL: http://documents-api
+  

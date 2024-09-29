@@ -212,4 +212,4 @@ api.add_resource(CitizensTransferContinueDocuments, '/transfers/api/citizens/tra
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=int(getenv('PORT', '5000')))
