@@ -10,13 +10,6 @@ import util
 from circuitbreaker import circuit
 
 app = Flask(__name__)
-def ping():
-    return jsonify({"message": "This is working!", "path": "/api/info"}), 200
-app.add_url_rule(
-        "/api/info",
-        view_func=ping,
-        methods=["GET"],
-    )
 
 api = Api(app)
 
@@ -76,7 +69,6 @@ class CitizensTransfer(Resource):
     @circuit(failure_threshold=2)
     def request_documents(self, documents_api_url, citizen_id):
         response = requests.post(f"{documents_api_url}/api/v1/documents/files/{citizen_id}")
-
         response.raise_for_status()
         return response
 
@@ -134,7 +126,7 @@ class CitizensTransfer(Resource):
                     "operatorUrl": operator_url
                 }
                 send_to_rabbitmq_citizen(message)
-                # Responder al consumidor que la transferencia está en proceso
+                # Responder al frontend que la transferencia está en proceso
                 return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
 
             # Obtener la URL del servicio Documents desde el archivo de configuración
@@ -167,49 +159,45 @@ class CitizensTransferContinueDocuments(Resource):
     def post(self):
         try:
             # Verificar si el cuerpo de la petición contiene datos JSON
-            data = request.get_json()
+            citizen_response = request.get_json()
 
-            if 'citizen_id' not in data or 'operator_url' not in data:
-                return {"message": "Los parámetros 'citizen_id' y 'operator_url' son requeridos."}, 400
+            citizen_id = citizen_response['citizen_id']
+            operator_url = citizen_response['operator_url']
+            operator_id = citizen_response['operator_id']
 
-            citizen_id = data['citizen_id']
-            operator_url = data['operator_url']
+            try:
+                # Llamado al servicio de Documents
+                documents_service_url = Config.DOCUMENT_API_URL
+                documents_response = requests.post(f"{documents_service_url}/api/v1/documents/files/{citizen_id}")
+            except Exception as err:
+                send_to_rabbitmq_document(citizen_response.json())
+                return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
 
-            # Aquí iría la lógica de procesamiento del documento con el servicio de Documents
+            try:
+                # Llamado al servicio del operador externo
+                third_party_operator_response = self.request_third_party_operator(operator_url, documents_response, citizen_response)
+            except Exception as err:
+                send_to_rabbitmq_document(citizen_response.json())
+                return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
 
-            return {"message": f"Consulta exitosa de URL's para el operador {operator_url} para el ciudadano {citizen_id}"}, 200
-
-            
-            '''
-            documents_service_url = Config.DOCUMENTS_API_URL
-            headers = {
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "citizen_id": citizen_id,
-                "operator_url": operator_url
-            }
-
-            # Enviar solicitud al servicio Documents
-            response = requests.post(documents_service_url, json=payload, headers=headers)
-
-            if response.status_code == 200:
-                return {"message": f"Documento procesado correctamente para el ciudadano {citizen_id}"}, 200
-            else:
-                return {"message": f"Error al procesar el documento para el ciudadano {citizen_id}", "details": response.text}, 500
-
-            '''
+            return {"message": f"El ciudadano {citizen_id} ha sido transferido al {operator_id} de forma exitosa."}, 200
 
         except Exception as e:
             return {"message": str(e)}, 500
+
+# API heartbeat
+class Heartbeat(Resource):
+    def get(self):
+        try:
+            return {"status": "ok", "message": "Service is running"}, 200
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 500
 
 
 # Rutas y recursos para las APIs
 api.add_resource(CitizensTransfer, '/transfers/api/citizens/transfer')
 api.add_resource(CitizensTransferContinueDocuments, '/transfers/api/citizens/transfer/continue/documents')
-
-
-
+api.add_resource(Heartbeat, '/api/info')
 
 if __name__ == '__main__':
     app.run(debug=True)
