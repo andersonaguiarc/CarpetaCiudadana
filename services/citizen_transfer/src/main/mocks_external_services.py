@@ -3,6 +3,7 @@ from flask_restful import Resource, Api
 import jwt  # Librería para manejar JWT
 from werkzeug.exceptions import BadRequest, Unauthorized
 from config import Config
+import json
 
 app = Flask(__name__)
 api = Api(app)
@@ -55,11 +56,20 @@ class MocksCitizen(Resource):
         id_usuario = payload.get('sub')
 
         return {"message": f"Unregister del ciudadano exitoso para el usuario {id_usuario}"}, 200
+    
+class MocksRegisterTransferCitizen(Resource):
+    
+    def post(self):
+        register_transfered_citizen = request.get_json()
+        message_response = json.dumps(register_transfered_citizen)
+        print(message_response)
+        return {"message": "Transferencia del ciudadano exitosa"}, 200
 
 
 # Rutas y recursos para el API
 api.add_resource(MocksDocument, '/documents/api/files/<string:id_citizen>')
 api.add_resource(MocksCitizen, '/users/api/citizens/transfer')
+api.add_resource(MocksRegisterTransferCitizen, '/api/citizens/register')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5007)

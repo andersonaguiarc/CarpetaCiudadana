@@ -4,4 +4,5 @@ services/auth/config/firebase/
 services/auth/manifests/test/auth-ms-secrets.yaml
 services/auth/config/firebase/service-account.json
 services/files/manifests/test/files-ms-secrets.yaml
+services/citizen_transfer/src/main/mocks_external_services.py
 docker-compose.yml

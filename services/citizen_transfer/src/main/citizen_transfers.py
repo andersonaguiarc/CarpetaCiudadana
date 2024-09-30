@@ -14,7 +14,7 @@ app = Flask(__name__)
 api = Api(app)
 
 # Función para enviar mensaje al exchange citizen en RabbitMQ
-def send_to_rabbitmq_citizen(message):
+def send_to_rabbitmq_citizen(message, exchange_rabbit, routing_key_rabbit):
     try:
         message = json.dumps(message)
         credentials = pika.PlainCredentials(Config.USER_RABBITMQ, Config.PASS_RABBITMQ)
@@ -25,9 +25,9 @@ def send_to_rabbitmq_citizen(message):
         channel = connection.channel()
 
         # Publicar el mensaje en el exchange
-        channel.basic_publish(exchange=Config.EXCHANGE_NAME_TRANSER_TO_CITIZEN, routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_CITIZEN, body=message)
+        channel.basic_publish(exchange=exchange_rabbit, routing_key=routing_key_rabbit, body=message)
 
-        print(f"Mensaje enviado a RabbitMQ en el exchange '{Config.EXCHANGE_NAME_TRANSER_TO_CITIZEN}': {message}")
+        print(f"Mensaje enviado a RabbitMQ en el exchange '{exchange_rabbit}': {message}")
 
         # Cerrar la conexión
         connection.close()
@@ -125,7 +125,9 @@ class CitizensTransfer(Resource):
                     "userId": citizen_id,
                     "operatorUrl": operator_url
                 }
-                send_to_rabbitmq_citizen(message)
+                exchange=Config.EXCHANGE_NAME_TRANSER_TO_CITIZEN
+                routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_CITIZEN
+                send_to_rabbitmq_citizen(message, exchange, routing_key)
                 # Responder al frontend que la transferencia está en proceso
                 return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
 
@@ -187,12 +189,44 @@ class CitizensTransferContinueDocuments(Resource):
         
 
 class RegisterTransferedCitizen(Resource):
+    
+    @circuit(failure_threshold=2)
+    def request_register_transfered_citizen(self, register_citizen_url, message_request):
+        # Enviar mensaje servicio RegisterCitizen
+        register_transfered_citizen_response = requests.post(register_citizen_url, json=message_request)
+        register_transfered_citizen_response.raise_for_status()
+        
+        return register_transfered_citizen_response
+    
+    
     def post(self):
         register_transfered_citizen = request.get_json()
-        # Convertir los datos en una cadena JSON y luego imprimir
-        print(json.dumps(register_transfered_citizen))
-       
-        return {"message": "Citizen received"}, 200
+
+        # Transformar JSON a mensaje esperado por CitizenRegister
+        register_transfered_citizen['name'] = register_transfered_citizen.pop('citizenName')
+        register_transfered_citizen['email'] = register_transfered_citizen.pop('citizenEmail')
+        register_transfered_citizen.pop('Documents', None)
+        register_transfered_citizen['address'] = 'Transfered'
+        register_transfered_citizen['operatorUrl'] = register_transfered_citizen.pop('confirmationURL')
+
+        # Convertir el diccionario actualizado en un JSON string
+        message = json.dumps(register_transfered_citizen)
+
+        # Registro de nuevo ciudadano a Citizen
+        register_citizen_url = Config.REGISTER_CITIZEN_API_URL
+        try:
+            register_citizen_response = self.request_register_transfered_citizen(register_citizen_url, message)
+        except Exception as err:
+            exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_CITIZEN
+            routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_CITIZEN
+            send_to_rabbitmq_citizen(message, exchange, routing_key)
+            return {"message": f"Transferencia del ciudadano {register_transfered_citizen['id']} en proceso", "details": str(err)}, 200
+
+        # Imprimir el JSON formateado
+        #print(message)
+
+        # Devolver una respuesta con el mensaje transformado
+        return {"message": "Citizen received", "data": register_transfered_citizen}, 200
 
 
 # API heartbeat
