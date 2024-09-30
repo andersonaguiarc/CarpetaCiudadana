@@ -184,6 +184,16 @@ class CitizensTransferContinueDocuments(Resource):
 
         except Exception as e:
             return {"message": str(e)}, 500
+        
+
+class RegisterTransferedCitizen(Resource):
+    def post(self):
+        register_transfered_citizen = request.get_json()
+        # Convertir los datos en una cadena JSON y luego imprimir
+        print(json.dumps(register_transfered_citizen))
+       
+        return {"message": "Citizen received"}, 200
+
 
 # API heartbeat
 class Heartbeat(Resource):
@@ -198,7 +208,8 @@ class Heartbeat(Resource):
 # Rutas y recursos para las APIs
 api.add_resource(CitizensTransfer, '/transfers/api/citizens/transfer')
 api.add_resource(CitizensTransferContinueDocuments, '/transfers/api/citizens/transfer/continue/documents')
+api.add_resource(RegisterTransferedCitizen, '/transfers/api/citizens/external')
 api.add_resource(Heartbeat, '/api/info')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=Config.PORT)
+    app.run(host='localhost', debug=True, port=Config.PORT)
