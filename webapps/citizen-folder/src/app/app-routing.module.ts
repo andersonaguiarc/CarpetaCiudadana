@@ -9,7 +9,7 @@ import { CertificarComponent } from './certificar/certificar.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { TransferenciaComponent } from './transferencia/transferencia.component';
-import { ProcesoTransferenciaComponent } from './proceso-transferencia/proceso-transferencia.component'
+import { ProcesoTransferenciaComponent } from './proceso-transferencia/proceso-transferencia.component';
 import { authGuard } from './guards/auth.guard'; // Importación del guard
 
 const routes: Routes = [
