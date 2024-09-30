@@ -12,7 +12,7 @@ from config import Config
 @circuit(failure_threshold=2)
 def callback(ch, method, properties, body):
     try:
-        print(f"Mensaje recibido: {body}")
+        print(f"Mensaje recibido: {body}", flush=True,)
         # Convertir el mensaje de la cola a un diccionario de Python
         message = json.loads(body)    
         register_transfered_citizen_url = Config.REGISTER_TRANSFERED_CITIZEN_API_URL
@@ -26,12 +26,12 @@ def callback(ch, method, properties, body):
         )
 
     except Exception as e:
-        print(f"Error al procesar el mensaje de la cola: {str(e)}")
+        print(f"Error al procesar el mensaje de la cola: {str(e)}", flush=True)
 
 # Configuración de RabbitMQ
 def main():
     try:
-        print("Iniciando worker...")
+        print("Iniciando worker...", flush=True)
         credentials = pika.PlainCredentials(Config.USER_RABBITMQ, Config.PASS_RABBITMQ)
 
         # Conexión a RabbitMQ
@@ -46,7 +46,7 @@ def main():
         queue_name = Config.QUEUE_NAME_EXTERNAL_CITIZEN_TO_REGISTER
         #channel.queue_declare(queue=queue_name, durable=True)
 
-        print(f"Esperando mensajes de la cola {queue_name}...")
+        print(f"Esperando mensajes de la cola {queue_name}...", flush=True)
 
         # Configurar el callback cuando llega un mensaje
         channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
@@ -55,8 +55,7 @@ def main():
         channel.start_consuming()
 
     except Exception as e:
-        print(f"Error en el worker: {str(e)}")
+        print(f"Error en el worker: {str(e)}", flush=True)
 
 if __name__ == '__main__':
-    print('dentro de main')
     main()

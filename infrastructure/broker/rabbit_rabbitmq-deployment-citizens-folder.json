@@ -151,6 +151,18 @@
             }
         },
         {
+            "name": "delayed_documents_to_register",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-dead-letter-exchange": "delayed_documents_to_register",
+                "x-dead-letter-routing-key": "documents_to_register",
+                "x-message-ttl": 60000,
+                "x-queue-type": "undefined"
+            }
+        },
+        {
             "name": "delayed_citizen_to_delete_and_transfer",
             "vhost": "/",
             "durable": true,
@@ -172,6 +184,24 @@
             }
         },
         {
+            "name": "documents_to_register",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "undefined"
+            }
+        },
+        {
+            "name": "documents_to_register_replier",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "undefined"
+            }
+        },
+        {
             "name": "document_to_certificate",
             "vhost": "/",
             "durable": true,
@@ -187,6 +217,18 @@
             "auto_delete": false,
             "arguments": {
                 "x-queue-type": "classic"
+            }
+        },
+        {
+            "name": "delayed_delete_user_from_documents",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-dead-letter-exchange": "delayed_delete_user_from_documents",
+                "x-dead-letter-routing-key": "delete_user_from_all_system",
+                "x-message-ttl": 60000,
+                "x-queue-type": "undefined"
             }
         },
         {
@@ -221,7 +263,34 @@
             "arguments": {}
         },
         {
+            "name": "documents_to_register",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
             "name": "delayed_document_to_certificate",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "documents_to_register_replier",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "delayed_delete_user_from_documents",
             "vhost": "/",
             "type": "direct",
             "durable": true,
@@ -267,6 +336,15 @@
         },
         {
             "name": "delayed_citizen_to_delete_and_transfer",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        },
+        {
+            "name": "delayed_documents_to_register",
             "vhost": "/",
             "type": "direct",
             "durable": true,
@@ -439,6 +517,22 @@
             "arguments": {}
         },
         {
+            "source": "delayed_delete_user_from_documents",
+            "vhost": "/",
+            "destination": "delayed_delete_user_from_documents",
+            "destination_type": "queue",
+            "routing_key": "delete_user_from_all_system",
+            "arguments": {}
+        },
+        {
+            "source": "delayed_delete_user_from_documents",
+            "vhost": "/",
+            "destination": "delete_user_from_documents",
+            "destination_type": "queue",
+            "routing_key": "delete_user_from_all_system",
+            "arguments": {}
+        },
+        {
             "source": "delayed_document_to_certificate",
             "vhost": "/",
             "destination": "delayed_document_to_certificate",
@@ -452,6 +546,22 @@
             "destination": "document_to_certificate",
             "destination_type": "queue",
             "routing_key": "document_to_certificate",
+            "arguments": {}
+        },
+        {
+            "source": "delayed_documents_to_register",
+            "vhost": "/",
+            "destination": "delayed_documents_to_register",
+            "destination_type": "queue",
+            "routing_key": "delayed_documents_to_register",
+            "arguments": {}
+        },
+        {
+            "source": "delayed_documents_to_register",
+            "vhost": "/",
+            "destination": "documents_to_register",
+            "destination_type": "queue",
+            "routing_key": "documents_to_register",
             "arguments": {}
         },
         {
@@ -484,6 +594,22 @@
             "destination": "document_to_certificate",
             "destination_type": "queue",
             "routing_key": "document_to_certificate",
+            "arguments": {}
+        },
+        {
+            "source": "documents_to_register",
+            "vhost": "/",
+            "destination": "documents_to_register",
+            "destination_type": "queue",
+            "routing_key": "documents_to_register",
+            "arguments": {}
+        },
+        {
+            "source": "documents_to_register_replier",
+            "vhost": "/",
+            "destination": "documents_to_register_replier",
+            "destination_type": "queue",
+            "routing_key": "documents_to_register_replier",
             "arguments": {}
         },
         {
