@@ -86,7 +86,7 @@ export const Register = async (req: Request, res: Response) => {
                     , email: userToRegister.email
                 });
 
-                if(!requestFromTransfers) await publishMessage('delete_user_from_auth', 'direct', 'delete_user_from_auth', value);
+                if (!requestFromTransfers) await publishMessage('delete_user_from_auth', 'direct', 'delete_user_from_auth', value);
 
                 res.status(501).json({
                     errorCode: 'FAILED_TO_REGISTER_USER_TO_GOV_CARPETA'
@@ -124,6 +124,7 @@ export const Register = async (req: Request, res: Response) => {
             const ROUTING_KEY_TRANSFERS_REPLIER = 'citizen_registered_transfers_replier';
             const userCreated = { ...user };
             userCreated['operatorUrl'] = req.body.operatorUrl;
+            if (req.body.mustSendDocuments) userCreated['Documents'] = req.body.Documents;
             await publishMessage(EXCHANGE_NAME_TRANSFERS_REPLIER, 'direct', ROUTING_KEY_TRANSFERS_REPLIER, JSON.stringify(userCreated));
         }
 

@@ -24,6 +24,7 @@ const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
         };
 
         parsedMessage.notifyRegistrationToTransfers = !!parsedMessage.operatorUrl;
+        parsedMessage.mustSendDocuments = !!parsedMessage.Documents;
 
         const breaker = new CircuitBreaker(axios.post, options);
         await breaker.fire(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/register`, parsedMessage)
@@ -38,7 +39,7 @@ const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
 
                 const DELAYED_QUEUE_NAME = 'delayed_citizen_to_register';
 
-                await publishMessage(DELAYED_QUEUE_NAME, 'direct', DELAYED_QUEUE_NAME, messageContent);
+                await publishMessage(DELAYED_QUEUE_NAME, 'direct', DELAYED_QUEUE_NAME, JSON.stringify(parsedMessage));
 
             });
 

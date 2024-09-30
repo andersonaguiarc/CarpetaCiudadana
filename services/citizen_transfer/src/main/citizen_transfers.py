@@ -304,4 +304,4 @@ api.add_resource(RegisterTransferedCitizen, '/transfers/api/citizens/external')
 api.add_resource(Heartbeat, '/api/info')
 
 if __name__ == '__main__':
-    app.run(host='localhost', debug=True, port=Config.PORT)
+    app.run(host='0.0.0.0', debug=True, port=Config.PORT)

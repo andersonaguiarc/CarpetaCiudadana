@@ -13,6 +13,7 @@ data:
   EXCHANGE_NAME_TRANSER_TO_DOCUMENT: delayed_citizen_to_delete_and_transfer_replier
   ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT: delayed_citizen_to_delete_and_transfer_replier
   QUEUE_NAME_CITIZEN_TO_TRANSFER_REPLIER: citizen_to_delete_and_transfer_replier
+  QUEUE_NAME_EXTERNAL_CITIZEN_TO_REGISTER: external_citizen_to_register
   CITIZEN_API_URL: http://users-api
   DOCUMENT_API_URL: http://documents-api
   

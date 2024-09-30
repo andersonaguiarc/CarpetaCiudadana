@@ -12,6 +12,7 @@ from config import Config
 @circuit(failure_threshold=2)
 def callback(ch, method, properties, body):
     try:
+        print(f"Mensaje recibido: {body}")
         # Convertir el mensaje de la cola a un diccionario de Python
         message = json.loads(body)    
         register_transfered_citizen_url = Config.REGISTER_TRANSFERED_CITIZEN_API_URL
@@ -28,8 +29,9 @@ def callback(ch, method, properties, body):
         print(f"Error al procesar el mensaje de la cola: {str(e)}")
 
 # Configuración de RabbitMQ
-def start_worker():
+def main():
     try:
+        print("Iniciando worker...")
         credentials = pika.PlainCredentials(Config.USER_RABBITMQ, Config.PASS_RABBITMQ)
 
         # Conexión a RabbitMQ
@@ -56,4 +58,5 @@ def start_worker():
         print(f"Error en el worker: {str(e)}")
 
 if __name__ == '__main__':
-    start_worker()
+    print('dentro de main')
+    main()
