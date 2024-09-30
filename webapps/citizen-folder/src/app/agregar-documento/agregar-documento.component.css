@@ -47,14 +47,15 @@
 
 .menu li a:hover {
     background-color: #3a8ca5;
-    cursor: pointer; /* Cambia el cursor a una manita al hacer hover */
+    cursor: pointer;
 }
+
 /* Estilo para el botón activo (presionado) */
 .menu li a.active {
-    background-color: #3a8ca5; /* Fondo del botón activo */
-    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.2); /* Sombra interna */
-    color: white; /* Color del texto en el botón activo */
-    font-weight: bold; /* Texto en negrita */
+    background-color: #3a8ca5;
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.2);
+    color: white;
+    font-weight: bold;
 }
 
 /* Área de contenido */
@@ -72,6 +73,7 @@
     align-items: center;
 }
 
+/* Área de carga de archivos */
 .upload-area {
     border: 2px dashed #ccc;
     padding: 30px;
@@ -80,6 +82,7 @@
     border-radius: 8px;
 }
 
+/* Input para subir archivos */
 .upload-area input[type="file"] {
     display: none;
 }
@@ -108,4 +111,53 @@
 
 .perfil-button:hover {
     background-color: #3a8ca5;
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+    .main-container {
+        grid-template-columns: 1fr;
+        padding: 0;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .content {
+        padding: 10px;
+    }
+
+    .upload-area {
+        padding: 20px;
+    }
+
+    .perfil-button {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .upload-button {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .menu li a {
+        padding: 10px 15px;
+    }
+}
+
+/* Estilo para el truncamiento de nombres largos en la lista de documentos */
+.document-list td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px; /* Ajusta el valor según el tamaño que desees */
+}
+
+/* No truncar el texto en el área de arrastre */
+.upload-area p {
+    white-space: normal;
+    word-break: break-word; /* Permitir que el texto largo se ajuste dentro del área de arrastre */
 }

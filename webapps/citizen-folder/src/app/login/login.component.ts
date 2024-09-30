@@ -13,7 +13,8 @@ import { isPlatformBrowser } from '@angular/common';
 export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
-  apiUrl: string = 'https://api.fastidentify.com/auth/api/citizens/login';
+  apiUrlLogin: string = 'https://api.fastidentify.com/auth/api/citizens/login';
+  apiUrlUser: string = 'https://api.fastidentify.com/users/api/citizens/user'; // API para obtener el estado del ciudadano
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -38,23 +39,51 @@ export class LoginComponent {
     const loginData = this.loginForm.value;
 
     // Enviar la solicitud de login a la API
-    this.http.post<any>(this.apiUrl, loginData).
-      subscribe({
-      next :(response) => {
+    this.http.post<any>(this.apiUrlLogin, loginData).subscribe({
+      next: (response) => {
         if (response && response.token && isPlatformBrowser(this.platformId)) {
           // Guardar el token en sessionStorage
           sessionStorage.setItem('token', response.token);
           console.log(response.token);
 
-          // Redirigir a la página principal
-          this.router.navigate(['/main-page']);
+          // Verificar el estado del ciudadano después de obtener el token
+          this.checkCitizenStatus();
         }
       },
-      error :(error) => {
+      error: (error) => {
         console.error('Error al iniciar sesión:', error);
         this.errorMessage = 'Error al iniciar sesión, por favor verifica tus credenciales.';
       }
-  });
+    });
+  }
+
+  // Método para verificar el estado del ciudadano
+  checkCitizenStatus(): void {
+    const token = sessionStorage.getItem('token');
+    
+    if (!token) {
+      console.error('Token no disponible');
+      return;
+    }
+
+    const headers = { Authorization: `Bearer ${token}` };
+
+    // Llamamos a la API para obtener el estado del ciudadano
+    this.http.get<any>(this.apiUrlUser, { headers }).subscribe({
+      next: (response) => {
+        if (response.status === 'transfered') {
+          // Si el estado es "transfer", redirigir a la página de proceso de transferencia
+          this.router.navigate(['/proceso-transferencia']);
+        } else {
+          // Si no, redirigir a la main-page
+          this.router.navigate(['/main-page']);
+        }
+      },
+      error: (error) => {
+        console.error('Error al verificar el estado del ciudadano:', error);
+        this.errorMessage = 'Error al verificar el estado del ciudadano.';
+      }
+    });
   }
 
   // Método para redirigir al registro
@@ -62,6 +91,7 @@ export class LoginComponent {
     this.router.navigate(['/register']);
   }
 
+  // Método para redirigir a la recuperación de contraseña
   goToForgotPassword(): void {
     this.router.navigate(['/forgot-password']);
   }

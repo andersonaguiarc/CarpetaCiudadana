@@ -41,6 +41,7 @@ export class ProfileComponent implements OnInit {
       this.http.get<any>('https://api.fastidentify.com/users/api/citizens/user', { headers }).subscribe({
         next: (response) => {
           this.user = response;
+          console.log(this.user);
         },
         error: (error) => {
           console.error('Error al cargar el perfil:', error);

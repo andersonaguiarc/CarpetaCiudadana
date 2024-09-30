@@ -11,6 +11,7 @@ export class ProcesoTransferenciaComponent {
   constructor(private router: Router) {}
 
   finalizarTransferencia(): void {
-    this.router.navigate(['/main-page']); // Volver a la página principal después de la transferencia
+    sessionStorage.removeItem('token');
+    this.router.navigate(['/login']);// Volver a la página principal después de la transferencia
   }
 }

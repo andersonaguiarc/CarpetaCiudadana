@@ -26,6 +26,7 @@
                       <th>Seleccionar</th>
                       <th>Nombre</th>
                       <th>Tamaño (KB)</th>
+                      <th>Estado </th>
                       <th>Última Modificación</th>
                   </tr>
               </thead>
@@ -37,6 +38,7 @@
                       </td>
                       <td>{{ document.name }}</td>
                       <td>{{ document.size }} KB</td>
+                      <td>{{ document.status }}</td>
                       <td>{{ document.modified | date:'short' }}</td>
                   </tr>
               </tbody>

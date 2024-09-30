@@ -46,9 +46,12 @@
     transition: background-color 0.3s ease;
 }
 
+
 .menu li a:hover {
     background-color: #3a8ca5;
+    cursor: pointer; /* Cambia el cursor a una manita al hacer hover */
 }
+/* Estilo para el botón activo (presionado) */
 
 .menu li a.active {
     background-color: #3a8ca5;

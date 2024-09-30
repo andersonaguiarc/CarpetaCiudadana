@@ -26,6 +26,7 @@
                     <tr>
                         <th>Nombre</th>
                         <th>Tamaño (KB)</th>
+                        <th>Estado</th>
                         <th>Última Modificación</th>
                         <th>Compartir</th>
                     </tr>
@@ -34,6 +35,7 @@
                     <tr *ngFor="let document of documents">
                         <td>{{ document.name }}</td>
                         <td>{{ document.size }}</td>
+                        <td>{{ document.status }}</td>
                         <td>{{ document.modified | date:'short' }}</td>
                         <td><button class="share-button">🔗</button></td>
                     </tr>

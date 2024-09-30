@@ -51,7 +51,8 @@ export class CertificarComponent implements OnInit {
               name: doc.path,
               size: (doc.size / 1024).toFixed(2), // Convertimos el tamaño de bytes a KB
               modified: doc.last_modified, // Usamos la fecha de modificación del documento
-              path: doc.path // Usamos este campo para operaciones futuras si es necesario
+              path: doc.path, // Usamos este campo para operaciones futuras si es necesario
+              status: doc.status
             }));
           } else {
             console.error('La propiedad "results" no está en la respuesta.');
@@ -101,6 +102,7 @@ export class CertificarComponent implements OnInit {
         next: (response) => {
           console.log('Documento certificado exitosamente:', response);
           alert('El documento ha sido certificado exitosamente.');
+          this.loadDocuments();
         },
         error: (error) => {
           console.error('Error al certificar el documento:', error);

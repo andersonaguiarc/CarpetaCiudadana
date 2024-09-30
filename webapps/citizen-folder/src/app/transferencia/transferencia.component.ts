@@ -9,15 +9,18 @@ import { Router } from '@angular/router';
 })
 export class TransferenciaComponent implements OnInit {
   operators: any[] = [];
-  selectedOperator: string = '';
+  selectedOperator: string = ''; // Será el `operator_id` seleccionado
+  citizenId: string = ''; // Guardamos el ID del ciudadano autenticado
   apiUrlOperators: string = 'https://api.fastidentify.com/operators/api/operators'; // API para obtener operadores
-  apiUrlTransfer: string = 'https://api.fastidentify.com/transfers/api/citizens/transfer'; // API para hacer la transferencia
+  apiUrlTransfer: string = 'https://api.fastidentify.com/users/api/citizens/transfer'; // API para hacer la transferencia
+  apiUrlCitizen: string = 'https://api.fastidentify.com/users/api/citizens/user'; // API para obtener el ciudadano autenticado
 
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
     this.verifyToken();
-    this.loadOperators();
+    this.loadCitizenId(); // Cargar el ID del ciudadano
+    this.loadOperators(); // Cargar lista de operadores
   }
 
   // Verificar el token de autenticación
@@ -25,6 +28,24 @@ export class TransferenciaComponent implements OnInit {
     const token = sessionStorage.getItem('token');
     if (!token) {
       this.router.navigate(['/login']);
+    }
+  }
+
+  // Cargar ID del ciudadano autenticado
+  loadCitizenId(): void {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+      this.http.get<any>(this.apiUrlCitizen, { headers }).subscribe({
+        next: (response) => {
+          this.citizenId = response.id; // Asignar el ID del ciudadano autenticado
+          console.log('ID del ciudadano:', this.citizenId);
+        },
+        error: (error) => {
+          console.error('Error al obtener el ID del ciudadano:', error);
+          this.router.navigate(['/login']);
+        }
+      });
     }
   }
 
@@ -54,22 +75,28 @@ export class TransferenciaComponent implements OnInit {
     }
 
     const token = sessionStorage.getItem('token');
-    const citizenId = '1234567890'; // Este ID debe ser dinámico dependiendo del usuario autenticado
+    const selectedOperatorData = this.operators.find(op => op.id === this.selectedOperator); // Encuentra el operador seleccionado
+
+    if (!selectedOperatorData) {
+      alert('Operador seleccionado no válido.');
+      return;
+    }
 
     const body = {
-      citizenId: citizenId,
-      transferTo: this.selectedOperator
+      citizenId: this.citizenId, // Usamos el ID dinámico del ciudadano autenticado
+      operator_id: selectedOperatorData.id, // El ID del operador seleccionado
+      operator_url: selectedOperatorData.url // La URL del operador seleccionado
     };
 
     if (token) {
       const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
       this.http.patch(this.apiUrlTransfer, body, { headers }).subscribe({
         next: (response) => {
-          alert('Transferencia realizada con éxito.');
           this.router.navigate(['/proceso-transferencia']); // Redirigir a pantalla de confirmación
         },
         error: (error) => {
           console.error('Error al realizar la transferencia:', error);
+          alert('Error al realizar la transferencia.');
         }
       });
     }

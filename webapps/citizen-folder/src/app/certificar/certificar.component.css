@@ -6,6 +6,12 @@
     background-color: var(--colorFondo);  /* Fondo general */
 }
 
+@media (max-width: 768px) {
+    .main-container {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Sidebar (barra lateral) */
 .sidebar {
     background-color: var(--sidebarBg);
@@ -45,13 +51,6 @@
     transition: background-color 0.3s ease;
 }
 
-/* Botón Certificar Documentos siempre activo (presionado) */
-.menu li a.active {
-    background-color: #3a8ca5;
-    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Efecto hover para los botones de la lista */
 .menu li a:hover {
     background-color: #3a8ca5;
     cursor: pointer; /* Cambia el cursor a una manita al hacer hover */
@@ -65,6 +64,12 @@
     gap: 20px; /* Espacio entre elementos del contenido */
 }
 
+@media (max-width: 768px) {
+    .content {
+        padding: 10px;
+    }
+}
+
 .content-header {
     display: flex;
     justify-content: space-between;
@@ -73,7 +78,8 @@
 }
 
 .search-bar {
-    width: 300px;
+    width: 100%;
+    max-width: 300px;
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #ccc;
@@ -97,9 +103,18 @@
     color: #333;
 }
 
-.document-list td:nth-child(4) {
-    font-weight: bold;
-    color: #333;
+/* Mostrar solo 10 caracteres del nombre */
+.document-list td {
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+    .document-list td {
+        max-width: 50px;
+    }
 }
 
 /* Botón Aceptar en la parte inferior */
