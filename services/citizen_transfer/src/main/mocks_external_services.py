@@ -69,7 +69,7 @@ class MocksRegisterTransferCitizen(Resource):
 # Rutas y recursos para el API
 api.add_resource(MocksDocument, '/documents/api/files/<string:id_citizen>')
 api.add_resource(MocksCitizen, '/users/api/citizens/transfer')
-api.add_resource(MocksRegisterTransferCitizen, '/api/citizens/register')
+api.add_resource(MocksRegisterTransferCitizen, '/registration-exp/api/citizens/register')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5007)

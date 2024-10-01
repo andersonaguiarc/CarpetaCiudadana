@@ -7,3 +7,6 @@ services/files/manifests/test/files-ms-secrets.yaml
 services/citizen_transfer/src/main/mocks_external_services.py
 docker-compose.yml
 venv/
+workers/external_citizen_worker/src/main/.env
+services/citizen_transfer/src/main/.env
+workers/register_transfer_citizen_worker/src/main/.env

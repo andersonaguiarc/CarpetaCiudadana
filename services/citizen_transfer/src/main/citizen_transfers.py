@@ -8,6 +8,7 @@ from werkzeug.exceptions import BadRequest, Unauthorized
 from config import Config
 import util
 from circuitbreaker import circuit
+import copy
 
 app = Flask(__name__)
 
@@ -36,7 +37,7 @@ def send_to_rabbitmq_citizen(message, exchange_rabbit, routing_key_rabbit):
         print(f"Error al enviar el mensaje a RabbitMQ: {str(e)}")
 
 
-# Función para enviar mensaje al exchange citizen en RabbitMQ
+# Función para enviar mensaje al exchange documents en RabbitMQ
 def send_to_rabbitmq_document(message, exchange_rabbit, routing_key_rabbit):
     try:
         message = json.dumps(message)
@@ -213,6 +214,45 @@ class CitizensTransferContinueDocuments(Resource):
         except Exception as e:
             return {"message": str(e)}, 500
         
+# API para recibir el mensaje del worker register_transfer_citizen y continuar el procesamiento en Documents
+class RegisterTransferDocuments(Resource):
+    def post(self):
+        try:
+            citizen_worker_response = request.get_json()
+
+            # Transformar a mensaje válido para Documents
+            citizen_worker_response['citizenName'] = citizen_worker_response.pop('name')
+            citizen_worker_response['citizenEmail'] = citizen_worker_response.pop('email')
+            citizen_worker_response['confirmationURL'] = citizen_worker_response.pop('operatorUrl')
+            citizen_worker_response.pop('address', None)
+
+            message_documents = json.dumps(citizen_worker_response)
+            register_documents_url = Config.REGISTER_DOCUMENTS_API_URL
+            try:
+                register_documents_response = requests.post(register_documents_url, json=message_documents)
+            except Exception as err:
+                exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_DOCUMENTS
+                routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_DOCUMENTS
+                send_to_rabbitmq_document(message_documents, exchange, routing_key)
+                return {"message": "Transferencia del ciudadano en proceso", "details": str(err)}, 200
+            
+            # Confirmar al Operador tercero la transferencia exitosa
+            operator_url = citizen_worker_response['confirmationURL']
+            message_third = json.dumps({"message": "Citizen received"})
+            try:
+                register_third_response = requests.post(operator_url, message_third)
+            except Exception as err:
+                exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_THIRD
+                routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_THIRD
+                send_to_rabbitmq_third(message_third, exchange, routing_key)
+                return {"message": "Confirmación al operador externo en proceso", "details": str(err)}, 200
+            
+            return {"message": "Citizen received"}, 200
+
+        except Exception as e:
+            return {"message": str(e)}, 500
+        
+
 
 class RegisterTransferedCitizen(Resource):
     
@@ -239,7 +279,8 @@ class RegisterTransferedCitizen(Resource):
     
     def post(self):
         register_transfered_citizen = request.get_json()
-        register_transfered_document = request.get_json()
+        register_transfered_citizen_queue = copy.deepcopy(register_transfered_citizen)
+        register_transfered_document = copy.deepcopy(register_transfered_citizen)
 
         # Transformar JSON a mensaje esperado para Citizen
         register_transfered_citizen['name'] = register_transfered_citizen.pop('citizenName')
@@ -260,7 +301,14 @@ class RegisterTransferedCitizen(Resource):
         except Exception as err:
             exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_CITIZEN
             routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_CITIZEN
-            send_to_rabbitmq_citizen(message_citizen, exchange, routing_key)
+            #Crear mensaje para el exchange de Citizen
+            register_transfered_citizen_queue['name'] = register_transfered_citizen_queue.pop('citizenName')
+            register_transfered_citizen_queue['email'] = register_transfered_citizen_queue.pop('citizenEmail')
+            register_transfered_citizen_queue['operatorUrl'] = register_transfered_citizen_queue.pop('confirmationURL')
+            register_transfered_citizen_queue['address'] = 'Transfered'
+            message_citizen_queue = json.dumps(register_transfered_citizen_queue)
+            # Encolar si falla Citizen
+            send_to_rabbitmq_citizen(message_citizen_queue, exchange, routing_key)
             return {"message": "Transferencia del ciudadano en proceso", "details": str(err)}, 200
         
         # Transferir documentos a Documents
@@ -301,6 +349,7 @@ class Heartbeat(Resource):
 api.add_resource(CitizensTransfer, '/transfers/api/citizens/transfer')
 api.add_resource(CitizensTransferContinueDocuments, '/transfers/api/citizens/transfer/continue/documents')
 api.add_resource(RegisterTransferedCitizen, '/transfers/api/citizens/external')
+api.add_resource(RegisterTransferDocuments, '/transfers/api/documents/external')
 api.add_resource(Heartbeat, '/api/info')
 
 if __name__ == '__main__':
