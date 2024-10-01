@@ -10,3 +10,4 @@ venv/
 workers/external_citizen_worker/src/main/.env
 services/citizen_transfer/src/main/.env
 workers/register_transfer_citizen_worker/src/main/.env
+workers/register_transfer_document_worker/src/main/.env

@@ -252,6 +252,34 @@ class RegisterTransferDocuments(Resource):
         except Exception as e:
             return {"message": str(e)}, 500
         
+# API para recibir el mensaje del worker register_transfer_document y enviar la notificación al tercero
+class RegisterTransferThird(Resource):
+    def post(self):
+        try:
+            document_worker_response = request.get_json()
+
+
+            message_documents = json.dumps(document_worker_response)
+            register_documents_url = Config.REGISTER_DOCUMENTS_API_URL
+    
+            
+            # Confirmar al Operador tercero la transferencia exitosa
+            operator_url = message_documents['operatorURL']
+            id = message_documents['idCitizen']
+            message_third = json.dumps({"id": id})
+            try:
+                register_third_response = requests.post(operator_url, message_third)
+            except Exception as err:
+                exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_THIRD
+                routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_THIRD
+                send_to_rabbitmq_third(message_third, exchange, routing_key)
+                return {"message": "Confirmación al operador externo en proceso", "details": str(err)}, 200
+            
+            return {"message": "Success Notify"}, 200
+
+        except Exception as e:
+            return {"message": str(e)}, 500
+        
 
 
 class RegisterTransferedCitizen(Resource):
@@ -350,6 +378,7 @@ api.add_resource(CitizensTransfer, '/transfers/api/citizens/transfer')
 api.add_resource(CitizensTransferContinueDocuments, '/transfers/api/citizens/transfer/continue/documents')
 api.add_resource(RegisterTransferedCitizen, '/transfers/api/citizens/external')
 api.add_resource(RegisterTransferDocuments, '/transfers/api/documents/external')
+api.add_resource(RegisterTransferThird, '/transfers/api/third/notify')
 api.add_resource(Heartbeat, '/api/info')
 
 if __name__ == '__main__':
