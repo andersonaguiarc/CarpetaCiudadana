@@ -17,6 +17,7 @@ export const ExternalCitizenRegister = async (req: Request, res: Response) => {
             , name: req.body.citizenName
             , email: req.body.citizenEmail
             , documents: req.body.Documents
+            , confirmationURL: req.body.confirmationURL
         }
 
         console.log('externalCitizen: ', externalCitizen);

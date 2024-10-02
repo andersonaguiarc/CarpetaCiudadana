@@ -9,7 +9,6 @@ export const routes = (router: Router) => {
 
     router.post('/api/citizens/register', Register);
     router.get('/api/citizens/user', UserMiddleware, AuthenticatedUser);
-    router.post('/api/citizens/register', Register);
     router.put('/api/citizens/users/info/:userId', UserMiddleware, UpdateInfo);
     router.patch('/api/citizens/transfer', UserMiddleware, TransferCitizen);
     router.patch('/api/citizens/transfer-reply/:userId', UnauthenticatedUserMiddleware,TransferCitizenReply);

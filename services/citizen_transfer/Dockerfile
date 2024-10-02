@@ -13,4 +13,4 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8450
 
-CMD ["python3", "-u", "src/main/citizen_transfers.py"]
+CMD ["python3", "src/main/citizen_transfers.py"]

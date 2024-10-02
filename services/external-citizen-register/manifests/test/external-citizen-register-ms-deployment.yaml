@@ -22,11 +22,11 @@ spec:
       - name: external-citizen-register-api
         image: spbpatino/citizens-folder-external-citizen-register:latest
         imagePullPolicy: Always
-        #envFrom:
-        #- configMapRef:
-        #    name: external-citizen-register-api
-        #- secretRef:
-        #    name: external-citizen-register-api
+        envFrom:
+        - configMapRef:
+            name: external-citizen-register-api
+        - secretRef:
+            name: external-citizen-register-api
         ports:
         - containerPort: 8250
         resources:

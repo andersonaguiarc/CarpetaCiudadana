@@ -9,7 +9,7 @@ from config import Config
 import util
 from circuitbreaker import circuit
 import copy
-import sys
+
 
 app = Flask(__name__)
 
@@ -29,18 +29,19 @@ def send_to_rabbitmq_citizen(message, exchange_rabbit, routing_key_rabbit):
         # Publicar el mensaje en el exchange
         channel.basic_publish(exchange=exchange_rabbit, routing_key=routing_key_rabbit, body=message)
 
-        print(f"Mensaje enviado a RabbitMQ en el exchange '{exchange_rabbit}': {message}")
+        print(f"Mensaje enviado a RabbitMQ en el exchange '{exchange_rabbit}': {message}" ,flush=True)
 
         # Cerrar la conexión
         connection.close()
 
     except Exception as e:
-        print(f"Error al enviar el mensaje a RabbitMQ: {str(e)}")
+        print(f"Error al enviar el mensaje a RabbitMQ: {str(e)}", flush=True)
 
 
 # Función para enviar mensaje al exchange documents en RabbitMQ
 def send_to_rabbitmq_document(message, exchange_rabbit, routing_key_rabbit):
     try:
+        print("publishing to rabbitmq", message, exchange_rabbit, routing_key_rabbit, flush=True)
         message = json.dumps(message)
         credentials = pika.PlainCredentials(Config.USER_RABBITMQ, Config.PASS_RABBITMQ)
 
@@ -52,13 +53,13 @@ def send_to_rabbitmq_document(message, exchange_rabbit, routing_key_rabbit):
         # Publicar el mensaje en el exchange
         channel.basic_publish(exchange=exchange_rabbit, routing_key=routing_key_rabbit, body=message)
 
-        print(f"Mensaje enviado a RabbitMQ en el exchange '{exchange_rabbit}': {message}")
+        print(f"Mensaje enviado a RabbitMQ en el exchange '{exchange_rabbit}': {message}" ,flush=True)
 
         # Cerrar la conexión
         connection.close()
 
     except Exception as e:
-        print(f"Error al enviar el mensaje a RabbitMQ: {str(e)}")
+        print(f"Error al enviar el mensaje a RabbitMQ: {str(e)}", flush=True)
 
 
 def send_to_rabbitmq_third(message, exchange_rabbit, routing_key_rabbit):
@@ -74,27 +75,28 @@ def send_to_rabbitmq_third(message, exchange_rabbit, routing_key_rabbit):
         # Publicar el mensaje en el exchange
         channel.basic_publish(exchange=exchange_rabbit, routing_key=routing_key_rabbit, body=message)
 
-        print(f"Mensaje enviado a RabbitMQ en el exchange '{exchange_rabbit}': {message}")
+        print(f"Mensaje enviado a RabbitMQ en el exchange '{exchange_rabbit}': {message}" ,flush=True)
 
         # Cerrar la conexión
         connection.close()
 
     except Exception as e:
-        print(f"Error al enviar el mensaje a RabbitMQ: {str(e)}")
+        print(f"Error al enviar el mensaje a RabbitMQ: {str(e)}", flush=True)
 
 
-class CitizensTransfer(Resource):
+class CitizensTransfer():
     @circuit(failure_threshold=2)
     def request_citizen(self, citizen_api_url, headers):
-        response = requests.patch(citizen_api_url, headers=headers)
+        response = requests.patch(f"{citizen_api_url}/api/citizens/transfer", headers=headers)
         response.raise_for_status()
+        print(f"Response from Citizen API: {response.json()}")
         return response
 
     @circuit(failure_threshold=2)
     def request_documents(self, documents_api_url, citizen_id):
-        sys.stderr.write(f"{documents_api_url}/api/v1/documents/files/{citizen_id}")
+        print(f"{documents_api_url}/api/v1/documents/files/{citizen_id}", flush=True)
 
-        sys.stderr.write("Request Documents",f"{documents_api_url}/api/v1/documents/files/{citizen_id}")
+        print("Request Documents",f"{documents_api_url}/api/v1/documents/files/{citizen_id}", flush=True)
         response = requests.post(f"{documents_api_url}/api/v1/documents/files/{citizen_id}")
         response.raise_for_status()
         return response
@@ -113,8 +115,7 @@ class CitizensTransfer(Resource):
         try:
             # Verificar si el cuerpo de la petición contiene datos JSON
             data = request.get_json()
-            print("Solicitud de transferencia", file=sys.stderr)
-            print(data, file=sys.stdout)
+            print("Solicitud de transferencia",data, flush=True)
             # Validar la existencia del encabezado Authorization
             auth_header = request.headers.get('Authorization')
             if not auth_header:
@@ -147,9 +148,9 @@ class CitizensTransfer(Resource):
             # Realizar la petición PATCH al servicio Citizen
             try: 
                 citizen_response = self.request_citizen(citizen_api_url, headers)
-                sys.stderr.write("Respuesta servicio de citizens... ",citizen_response.json())
+                print(f"Respuesta servicio de citizens... ",citizen_response.json(), flush=True)
             except Exception as err:
-                sys.stderr.write("Error en llamado al servicio de citizens ",err)
+                print(f"Error en llamado al servicio de citizens ",err, flush=True)
                 message = {
                     "userId": citizen_id,
                     "operatorUrl": operator_url
@@ -164,9 +165,9 @@ class CitizensTransfer(Resource):
             documents_api_url = Config.DOCUMENT_API_URL     
             try:
                 documents_response = self.request_documents(documents_api_url, citizen_id)
-                sys.stderr.write("Respuesta servicio de documents... ",documents_response.json())
+                print(f"Respuesta servicio de documents... ",documents_response.json(), flush=True)
             except Exception as err:
-                sys.stderr.write("Error servicio de documents... ",err)
+                print(f"Error servicio de documents... ",err, flush=True)
                 exchange=Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT
                 routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT
                 send_to_rabbitmq_document(citizen_response.json(), exchange, routing_key)
@@ -175,9 +176,9 @@ class CitizensTransfer(Resource):
             # Consumo del servicio operador externo
             try:
                 third_party_operator_response = self.request_third_party_operator(operator_url, documents_response, citizen_response)
-                sys.stderr.write("Respuesta servicio de third_party_operator_response... ",third_party_operator_response.json())
+                print("Respuesta servicio de third_party_operator_response... ",third_party_operator_response.json(), flush=True)
             except Exception as err:
-                sys.stderr.write("Error servicio de third_party_operator_response... ",err)
+                print("Error servicio de third_party_operator_response... ",err, flush=True)
                 exchange=Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT
                 routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT
                 send_to_rabbitmq_document(citizen_response.json(), exchange, routing_key)
@@ -186,10 +187,13 @@ class CitizensTransfer(Resource):
             return {"message": f"El ciudadano {citizen_id} ha sido transferido al {operator_id} de forma exitosa."}, 200
 
         except BadRequest as e:
+            print(f"Error en la petición: {str(e)}", flush=True)
             return {"message": "Formato JSON inválido."}, 400
         except Exception as e:
+            print(f"Error en la petición: {str(e)}", flush=True)
             return {"message": str(e)}, 500
         except ValueError as e:
+            print(f"Error en la petición: {str(e)}", flush=True)
             raise Unauthorized("Encabezado de autorización mal formado")
 
 
@@ -229,7 +233,7 @@ class RegisterTransferDocuments(Resource):
     def post(self):
         try:
             citizen_worker_response = request.get_json()
-
+            print("citizen_worker_response", citizen_worker_response, flush=True)
             # Transformar a mensaje válido para Documents
             citizen_worker_response['citizenName'] = citizen_worker_response.pop('name')
             citizen_worker_response['citizenEmail'] = citizen_worker_response.pop('email')
@@ -321,27 +325,31 @@ class RegisterTransferedCitizen(Resource):
         register_transfered_document = copy.deepcopy(register_transfered_citizen)
 
         # Transformar JSON a mensaje esperado para Citizen
-        register_transfered_citizen['name'] = register_transfered_citizen.pop('citizenName')
-        register_transfered_citizen['email'] = register_transfered_citizen.pop('citizenEmail')
+        register_transfered_citizen['name'] = register_transfered_citizen.pop('name')
+        register_transfered_citizen['email'] = register_transfered_citizen.pop('email')
         register_transfered_citizen.pop('Documents', None)
         register_transfered_citizen['address'] = 'Transfered'
         register_transfered_citizen['operatorUrl'] = register_transfered_citizen.pop('confirmationURL')
 
         # Convertir el diccionario actualizado en un JSON string
-        message_citizen = json.dumps(register_transfered_citizen)
-        message_documents = json.dumps(register_transfered_document)
-        message_third = json.dumps({"message": "Citizen received"})
+        message_citizen = register_transfered_citizen
+        message_documents = register_transfered_document
+        message_third = {"id": register_transfered_citizen['id']}
+
+        message_documents['Documents'] = message_documents.pop('documents')
 
         # Registro de nuevo ciudadano a Citizen
         register_citizen_url = Config.REGISTER_CITIZEN_API_URL
         try:
+            print("message_citizen", message_citizen, flush=True)
             register_citizen_response = self.request_register_transfered_citizen(register_citizen_url, message_citizen)
         except Exception as err:
+            print("Error en llamado al servicio de citizens ",err, flush=True)
             exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_CITIZEN
             routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_CITIZEN
             #Crear mensaje para el exchange de Citizen
-            register_transfered_citizen_queue['name'] = register_transfered_citizen_queue.pop('citizenName')
-            register_transfered_citizen_queue['email'] = register_transfered_citizen_queue.pop('citizenEmail')
+            register_transfered_citizen_queue['name'] = register_transfered_citizen_queue.pop('name')
+            register_transfered_citizen_queue['email'] = register_transfered_citizen_queue.pop('email')
             register_transfered_citizen_queue['operatorUrl'] = register_transfered_citizen_queue.pop('confirmationURL')
             register_transfered_citizen_queue['address'] = 'Transfered'
             message_citizen_queue = json.dumps(register_transfered_citizen_queue)
@@ -352,8 +360,10 @@ class RegisterTransferedCitizen(Resource):
         # Transferir documentos a Documents
         register_documents_url = Config.REGISTER_DOCUMENTS_API_URL
         try:
+            print("message_documents", message_documents, flush=True)
             register_documents_response = self.request_register_transfered_documents(register_documents_url, message_documents)
         except Exception as err:
+            print("Error en llamado al servicio de documents ",err, flush=True)
             exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_DOCUMENTS
             routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_DOCUMENTS
             send_to_rabbitmq_citizen(message_documents, exchange, routing_key)
@@ -362,8 +372,10 @@ class RegisterTransferedCitizen(Resource):
         # Confirmar al Operador tercero la transferencia exitosa
         operator_url = register_transfered_citizen['operatorUrl']
         try:
+            print("message_third", message_third, flush=True)
             register_third_response = self.request_register_transfered_documents(operator_url, message_third)
         except Exception as err:
+            print("Error en llamado al servicio de third ",err, flush=True)
             exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_THIRD
             routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_THIRD
             send_to_rabbitmq_third(message_third, exchange, routing_key)
@@ -380,10 +392,21 @@ class Heartbeat(Resource):
             return {"message": "This is working!","path": "/api/info"}, 200
         except Exception as e:
             return {"status": "error", "message": str(e)}, 500
+    
+    def post(self):
+        try:
+            return {"message": "This is working!","path": "/api/info"}, 200
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 500
 
+app.add_url_rule(
+        f"/transfers/api/citizens/transfer",
+        view_func=CitizensTransfer().patch,
+        methods=["PATCH"],
+    )
 
 # Rutas y recursos para las APIs
-api.add_resource(CitizensTransfer, '/transfers/api/citizens/transfer')
+#api.add_resource(CitizensTransfer, '/transfers/api/citizens/transfer')
 api.add_resource(CitizensTransferContinueDocuments, '/transfers/api/citizens/transfer/continue/documents')
 api.add_resource(RegisterTransferedCitizen, '/transfers/api/citizens/external')
 api.add_resource(RegisterTransferDocuments, '/transfers/api/documents/external')
@@ -391,5 +414,5 @@ api.add_resource(RegisterTransferThird, '/transfers/api/third/notify')
 api.add_resource(Heartbeat, '/api/info')
 
 if __name__ == '__main__':
-    sys.stderr.write(f"Starting Citizen Transfer Service on port {Config.PORT}")
-    app.run(host='0.0.0.0', debug=True, port=Config.PORT)
+    print(f"Starting Citizen Transfer Service on port {Config.PORT}", flush=True)
+    app.run(host='0.0.0.0', debug=True, port=Config.PORT, use_reloader=False)

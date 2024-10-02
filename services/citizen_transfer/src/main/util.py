@@ -6,7 +6,6 @@ def decode_jwt(token):
         # Decodificar el JWT usando la clave secreta
         payload = jwt.decode(token, options={"verify_signature": False})
         return payload
-    except jwt.ExpiredSignatureError:
-        raise Unauthorized("El token ha expirado")
-    except jwt.InvalidTokenError:
+    except Exception as e:
+        print("Error al decodificar el JWT: ", e)
         raise Unauthorized("Token inválido")
