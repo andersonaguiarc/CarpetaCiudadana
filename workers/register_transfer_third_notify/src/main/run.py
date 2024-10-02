@@ -34,14 +34,16 @@ def main():
     """Main entry point for the application."""
     amqp_connection = create_amqp_connection()
 
-    citizen_transfer_url = os.getenv("CITIZEN_TRANSFER_API_URL")
+    citizen_transfer_url = os.getenv("CITIZEN_TRANSFER_API_BASE_URL")
     if not citizen_transfer_url:
-        raise ValueError("CITIZEN_TRANSFER_API_URL environment variable is required.")
+        raise ValueError(
+            "CITIZEN_TRANSFER_API_BASE_URL environment variable is required."
+        )
 
-    amqp_queue = os.getenv("QUEUE_NAME_REGISTER_TRANSFER_THIRD_NOTIFY")
+    amqp_queue = os.getenv("EXCHANGE_NAME_CITIZEN_TO_CONFIRM")
     if not amqp_queue:
         raise ValueError(
-            "QUEUE_NAME_REGISTER_TRANSFER_THIRD_NOTIFY environment variable is required."
+            "EXCHANGE_NAME_CITIZEN_TO_CONFIRM environment variable is required."
         )
 
     consumer = Consumer(
