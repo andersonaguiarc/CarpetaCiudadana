@@ -245,7 +245,7 @@ class Handler:
         user_id = g.user_id
 
         query = {
-            "user_id": user_id,
+            "user_id": int(user_id),
         }
 
         try:
@@ -282,7 +282,7 @@ class Handler:
             files_json = files_response.json()
 
             all_files_response = {
-                "id": user_id,
+                "id": int(user_id),
                 "Documents": {
                     result["path"]: [result["url"]] for result in files_json["results"]
                 },

@@ -15,6 +15,8 @@ def callback(ch, method, properties, body):
         citizens_transfer_url = f"{Config.CITIZEN_TRANSFER_API_URL}/continue/documents"
         payload = message
 
+        print(f"message: {message}", flush=True)
+
         # Enviar el mensaje al servicio CitizensTransfer para continuar el procesamiento
         response = requests.post(citizens_transfer_url, json=payload)
 
