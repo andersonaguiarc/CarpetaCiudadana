@@ -15,32 +15,51 @@
 
     <section class="content">
         <header class="content-header">
-            <input type="text" placeholder="Buscar" class="search-bar">
+            <input type="text" placeholder="Buscar" class="search-bar" [(ngModel)]="searchQuery" (input)="onSearch()">
             <button class="profile-button perfil-button" (click)="goToProfile()">Perfil</button>
         </header>
 
-        <section class="document-list">
-            <!-- Tabla de documentos -->
+        <section *ngIf="!searchQuery" class="document-list">
             <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Tamaño (KB)</th>
-                        <th>Estado</th>
-                        <th>Última Modificación</th>
-                        <th>Compartir</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let document of documents">
-                        <td>{{ document.name }}</td>
-                        <td>{{ document.size }}</td>
-                        <td>{{ document.status }}</td>
-                        <td>{{ document.modified | date:'short' }}</td>
-                        <td><button class="share-button">🔗</button></td>
-                    </tr>
-                </tbody>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Tamaño</th>
+                  <th>Última Modificación</th>
+                  <th>Compartir</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let document of documents">
+                  <td>{{ document.name }}</td>
+                  <td>{{ document.size }} KB</td>
+                  <td>{{ document.modified | date:'short' }}</td>
+                  <td><button class="share-button">🔗</button></td>
+                </tr>
+              </tbody>
             </table>
-        </section>
+          </section>
+          
+          <!-- Sección para mostrar solo los documentos filtrados cuando hay una búsqueda -->
+          <section *ngIf="searchQuery" class="document-list">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Tamaño</th>
+                  <th>Última Modificación</th>
+                  <th>Compartir</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let document of filteredDocuments">
+                  <td>{{ document.name }}</td>
+                  <td>{{ document.size }} KB</td>
+                  <td>{{ document.modified | date:'short' }}</td>
+                  <td><button class="share-button">🔗</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
     </section>
 </div>

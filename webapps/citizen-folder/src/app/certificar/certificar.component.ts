@@ -11,6 +11,8 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class CertificarComponent implements OnInit {
   documents: any[] = []; // Lista de documentos cargados
+  filteredDocuments: any[] = []; // Documentos filtrados por búsqueda
+  searchQuery: string = ''; // Búsqueda
   selectedDocument: any = null; // Documento seleccionado
   apiUrl: string = 'https://api.fastidentify.com/documents/api/documents'; // API para listar documentos
 
@@ -66,6 +68,12 @@ export class CertificarComponent implements OnInit {
       console.error('No se encontró token');
       this.router.navigate(['/login']); // Redirigir si no hay token
     }
+  }
+
+  onSearch(): void {
+    this.filteredDocuments = this.documents.filter(doc =>
+      doc.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
   }
 
   // Método para seleccionar un solo documento

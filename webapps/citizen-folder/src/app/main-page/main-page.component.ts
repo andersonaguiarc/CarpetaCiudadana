@@ -12,6 +12,8 @@ import { isPlatformBrowser } from '@angular/common';
 export class MainPageComponent implements OnInit {
   documents: any[] = []; // Lista de documentos cargados
   apiUrl: string = 'https://api.fastidentify.com/documents/api/documents'; // API para listar documentos
+  filteredDocuments: any[] = []; // Documentos filtrados por búsqueda
+  searchQuery: string = ''; // Búsqueda
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router) { }
 
@@ -66,6 +68,13 @@ export class MainPageComponent implements OnInit {
       this.router.navigate(['/login']); // Redirigir si no hay token
     }
   }
+
+  onSearch(): void {
+    this.filteredDocuments = this.documents.filter(doc =>
+      doc.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+    );
+  }
+
 
   // Navegación
   goToCertificar(): void {

@@ -12,7 +12,7 @@ export class TransferenciaComponent implements OnInit {
   selectedOperator: string = ''; // Será el `operator_id` seleccionado
   citizenId: string = ''; // Guardamos el ID del ciudadano autenticado
   apiUrlOperators: string = 'https://api.fastidentify.com/operators/api/operators'; // API para obtener operadores
-  apiUrlTransfer: string = 'https://api.fastidentify.com/users/api/citizens/transfer'; // API para hacer la transferencia
+  apiUrlTransfer: string = 'https://api.fastidentify.com/transfers/api/citizens/transfer'; // API para hacer la transferencia
   apiUrlCitizen: string = 'https://api.fastidentify.com/users/api/citizens/user'; // API para obtener el ciudadano autenticado
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -76,6 +76,7 @@ export class TransferenciaComponent implements OnInit {
 
     const token = sessionStorage.getItem('token');
     const selectedOperatorData = this.operators.find(op => op.id === this.selectedOperator); // Encuentra el operador seleccionado
+  
 
     if (!selectedOperatorData) {
       alert('Operador seleccionado no válido.');
@@ -85,7 +86,7 @@ export class TransferenciaComponent implements OnInit {
     const body = {
       citizenId: this.citizenId, // Usamos el ID dinámico del ciudadano autenticado
       operator_id: selectedOperatorData.id, // El ID del operador seleccionado
-      operator_url: selectedOperatorData.url // La URL del operador seleccionado
+      operator_url: selectedOperatorData.transferAPIURL // La URL del operador seleccionado
     };
 
     if (token) {
