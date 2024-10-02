@@ -76,3 +76,35 @@ spec:
           limits:
             cpu: "500m"
             memory: "512Mi"
+      
+      - name: citizens-transfer-register-transfer-documents-processor
+        image: spbpatino/citizens-folder-register-transfer-documents-worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: citizens-transfer-api
+        - secretRef:
+            name: citizens-transfer-api
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+      
+      - name: transfer-citizen-processor
+        image: spbpatino/citizens-folder-transfer-citizen-worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: citizens-transfer-api
+        - secretRef:
+            name: citizens-transfer-api
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

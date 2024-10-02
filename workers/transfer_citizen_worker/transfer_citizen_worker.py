@@ -19,12 +19,12 @@ def callback(ch, method, properties, body):
         response = requests.post(citizens_transfer_url, json=payload)
 
         if response.status_code == 200:
-            print(f"Procesado correctamente el mensaje para el ciudadano {citizen_id}")
+            print(f"Procesado correctamente el mensaje para el ciudadano {citizen_id}", flush=True)
         else:
-            print(f"Error al procesar el ciudadano {citizen_id}. Detalles: {response.text}")
+            print(f"Error al procesar el ciudadano {citizen_id}. Detalles: {response.text}", flush=True)
 
     except Exception as e:
-        print(f"Error al procesar el mensaje: {str(e)}")
+        print(f"Error al procesar el mensaje: {str(e)}", flush=True)
 
 # Configuración de RabbitMQ
 def start_worker():
@@ -41,9 +41,8 @@ def start_worker():
 
         # Declarar la cola desde donde se recibirán los mensajes
         queue_name = Config.QUEUE_NAME_CITIZEN_TO_TRANSFER_REPLIER
-        channel.queue_declare(queue=queue_name, durable=True)
 
-        print(f"Esperando mensajes de la cola {queue_name}...")
+        print(f"Esperando mensajes de la cola {queue_name}...", flush=True)
 
         # Configurar el callback cuando llega un mensaje
         channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
@@ -52,7 +51,7 @@ def start_worker():
         channel.start_consuming()
 
     except Exception as e:
-        print(f"Error en el worker: {str(e)}")
+        print(f"Error en el worker: {str(e)}", flush=True)
 
 if __name__ == '__main__':
     start_worker()

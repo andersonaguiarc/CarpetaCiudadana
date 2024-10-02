@@ -12,4 +12,4 @@ COPY . .
 
 ENV PYTHONPATH "/app"
 
-CMD ["python3", "register_transfer_citizen_worker.py"]
+CMD ["python3", "transfer_citizen_worker.py"]

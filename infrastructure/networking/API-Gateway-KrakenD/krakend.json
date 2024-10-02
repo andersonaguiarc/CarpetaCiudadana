@@ -599,6 +599,32 @@
                     "url_pattern": "/api/info"
                 }
             ]
+        },
+        {
+            "endpoint": "test/api/transferCitizen",
+            "input_headers": [
+                "*"
+            ],
+            "method": "POST",
+            "backend": [
+                {
+                    "host": [
+                        "http://localhost"
+                    ],
+                    "url_pattern": "/__dummy"
+                }
+            ],
+            "extra_config": {
+                "proxy": {
+                    "static": {
+                        "strategy": "errored",
+                        "data": {
+                            "code": 500,
+                            "message": "Internal Server Error"
+                        }
+                    }
+                }
+            }
         }
     ]
 }

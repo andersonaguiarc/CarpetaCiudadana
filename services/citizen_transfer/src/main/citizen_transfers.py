@@ -109,7 +109,7 @@ class CitizensTransfer(Resource):
         try:
             # Verificar si el cuerpo de la petición contiene datos JSON
             data = request.get_json()
-
+            print("Solicitud de transferencia",data, flush=True)
             # Validar la existencia del encabezado Authorization
             auth_header = request.headers.get('Authorization')
             if not auth_header:
@@ -142,8 +142,9 @@ class CitizensTransfer(Resource):
             # Realizar la petición PATCH al servicio Citizen
             try: 
                 citizen_response = self.request_citizen(citizen_api_url, headers)
+                print("Respuesta servicio de citizens... ",citizen_response.json(), flush=True)
             except Exception as err:
-                print(err, flush=True)
+                print("Error en llamado al servicio de citizens ",err, flush=True)
                 message = {
                     "userId": citizen_id,
                     "operatorUrl": operator_url
@@ -158,7 +159,9 @@ class CitizensTransfer(Resource):
             documents_api_url = Config.DOCUMENT_API_URL     
             try:
                 documents_response = self.request_documents(documents_api_url, citizen_id)
+                print("Respuesta servicio de documents... ",documents_response.json(), flush=True)
             except Exception as err:
+                print("Error servicio de documents... ",err, flush=True)
                 exchange=Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT
                 routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT
                 send_to_rabbitmq_document(citizen_response.json(), exchange, routing_key)
@@ -167,7 +170,9 @@ class CitizensTransfer(Resource):
             # Consumo del servicio operador externo
             try:
                 third_party_operator_response = self.request_third_party_operator(operator_url, documents_response, citizen_response)
+                print("Respuesta servicio de third_party_operator_response... ",third_party_operator_response.json(), flush=True)
             except Exception as err:
+                print("Error servicio de third_party_operator_response... ",err, flush=True)
                 exchange=Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT
                 routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT
                 send_to_rabbitmq_document(citizen_response.json(), exchange, routing_key)
