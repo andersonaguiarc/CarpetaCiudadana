@@ -181,7 +181,9 @@ class CitizensTransfer():
                 print("Error servicio de third_party_operator_response... ",err, flush=True)
                 exchange=Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT
                 routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT
-                send_to_rabbitmq_document(citizen_response.json(), exchange, routing_key)
+                citizen_to_enqueue = citizen_response.json()
+                citizen_to_enqueue['operatorUrl'] = operator_url
+                send_to_rabbitmq_document(citizen_to_enqueue, exchange, routing_key)
                 return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
 
             return {"message": f"El ciudadano {citizen_id} ha sido transferido al {operator_id} de forma exitosa."}, 200
@@ -206,7 +208,6 @@ class CitizensTransferContinueDocuments(Resource):
 
             citizen_id = citizen_response['citizen_id']
             operator_url = citizen_response['operator_url']
-            operator_id = citizen_response['operator_id']
 
             try:
                 # Llamado al servicio de Documents
@@ -219,11 +220,13 @@ class CitizensTransferContinueDocuments(Resource):
             try:
                 # Llamado al servicio del operador externo
                 third_party_operator_response = self.request_third_party_operator(operator_url, documents_response, citizen_response)
+                print("Respuesta servicio de third_party_operator_response Resiliencia... ",third_party_operator_response.json(), flush=True)
             except Exception as err:
+                print("Error servicio de third_party_operator_response Resiliencia... ",err, flush=True)
                 send_to_rabbitmq_document(citizen_response.json())
                 return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
 
-            return {"message": f"El ciudadano {citizen_id} ha sido transferido al {operator_id} de forma exitosa."}, 200
+            return {"message": f"El ciudadano {citizen_id} ha sido transferido al {operator_url} de forma exitosa."}, 200
 
         except Exception as e:
             return {"message": str(e)}, 500

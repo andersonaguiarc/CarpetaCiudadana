@@ -19,6 +19,7 @@ data:
   QUEUE_NAME_REGISTER_TRANSFER_TO_DOCUMENT: documents_to_register_replier
   EXCHANGE_NAME_REGISTER_TRANSFER_TO_DOCUMENTS: documents_to_register
   ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_DOCUMENTS: documents_to_register
+  CITIZEN_TRANSFER_API_BASE_URL: http://citizens-transfer-api
   CITIZEN_API_URL: http://users-api
   DOCUMENT_API_URL: http://documents-api
   CITIZEN_TRANSFER_API_URL: http://citizens-transfer-api/transfers/api/citizens/transfer
