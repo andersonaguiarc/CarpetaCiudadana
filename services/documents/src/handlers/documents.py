@@ -166,7 +166,7 @@ class Handler:
         document = {
             "_id": f"{user_id}/{file_name}",
             "path": file_name,
-            "user_id": user_id,
+            "user_id": int(user_id),
             "last_modified": datetime.datetime.now(),
             "size": len(data),
             "status": DocumentStatus.CREATED,
@@ -324,7 +324,7 @@ class Handler:
             document_record = {
                 "_id": f"{user_id}/{path}",
                 "path": path,
-                "user_id": user_id,
+                "user_id": int(user_id),
                 "last_modified": datetime.datetime.now(),
                 "size": len(data),
                 "status": DocumentStatus.CREATED,
@@ -436,6 +436,8 @@ class Handler:
         query = {
             "user_id": int(user_id),
         }
+
+        print("query",query, flush=True)
 
         try:
             self.documents.delete_many(query)

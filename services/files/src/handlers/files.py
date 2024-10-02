@@ -76,6 +76,7 @@ class Handler:
             path = os.path.join("/", self.bucket, user_id)
 
             if not self.fs.isdir(path):
+                print("No files found to delete", flush=True)
                 return make_response("No files found to delete", 201)
 
             self.fs.delete(path, recursive=True)
