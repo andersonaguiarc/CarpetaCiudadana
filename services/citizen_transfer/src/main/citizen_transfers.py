@@ -9,6 +9,7 @@ from config import Config
 import util
 from circuitbreaker import circuit
 import copy
+import sys
 
 app = Flask(__name__)
 
@@ -91,6 +92,9 @@ class CitizensTransfer(Resource):
 
     @circuit(failure_threshold=2)
     def request_documents(self, documents_api_url, citizen_id):
+        sys.stderr.write(f"{documents_api_url}/api/v1/documents/files/{citizen_id}")
+
+        sys.stderr.write("Request Documents",f"{documents_api_url}/api/v1/documents/files/{citizen_id}")
         response = requests.post(f"{documents_api_url}/api/v1/documents/files/{citizen_id}")
         response.raise_for_status()
         return response
@@ -109,7 +113,8 @@ class CitizensTransfer(Resource):
         try:
             # Verificar si el cuerpo de la petición contiene datos JSON
             data = request.get_json()
-            print("Solicitud de transferencia",data, flush=True)
+            print("Solicitud de transferencia", file=sys.stderr)
+            print(data, file=sys.stdout)
             # Validar la existencia del encabezado Authorization
             auth_header = request.headers.get('Authorization')
             if not auth_header:
@@ -142,9 +147,9 @@ class CitizensTransfer(Resource):
             # Realizar la petición PATCH al servicio Citizen
             try: 
                 citizen_response = self.request_citizen(citizen_api_url, headers)
-                print("Respuesta servicio de citizens... ",citizen_response.json(), flush=True)
+                sys.stderr.write("Respuesta servicio de citizens... ",citizen_response.json())
             except Exception as err:
-                print("Error en llamado al servicio de citizens ",err, flush=True)
+                sys.stderr.write("Error en llamado al servicio de citizens ",err)
                 message = {
                     "userId": citizen_id,
                     "operatorUrl": operator_url
@@ -159,9 +164,9 @@ class CitizensTransfer(Resource):
             documents_api_url = Config.DOCUMENT_API_URL     
             try:
                 documents_response = self.request_documents(documents_api_url, citizen_id)
-                print("Respuesta servicio de documents... ",documents_response.json(), flush=True)
+                sys.stderr.write("Respuesta servicio de documents... ",documents_response.json())
             except Exception as err:
-                print("Error servicio de documents... ",err, flush=True)
+                sys.stderr.write("Error servicio de documents... ",err)
                 exchange=Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT
                 routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT
                 send_to_rabbitmq_document(citizen_response.json(), exchange, routing_key)
@@ -170,9 +175,9 @@ class CitizensTransfer(Resource):
             # Consumo del servicio operador externo
             try:
                 third_party_operator_response = self.request_third_party_operator(operator_url, documents_response, citizen_response)
-                print("Respuesta servicio de third_party_operator_response... ",third_party_operator_response.json(), flush=True)
+                sys.stderr.write("Respuesta servicio de third_party_operator_response... ",third_party_operator_response.json())
             except Exception as err:
-                print("Error servicio de third_party_operator_response... ",err, flush=True)
+                sys.stderr.write("Error servicio de third_party_operator_response... ",err)
                 exchange=Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT
                 routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT
                 send_to_rabbitmq_document(citizen_response.json(), exchange, routing_key)
@@ -372,7 +377,6 @@ class RegisterTransferedCitizen(Resource):
 class Heartbeat(Resource):
     def get(self):
         try:
-            print("Heartbeat")
             return {"message": "This is working!","path": "/api/info"}, 200
         except Exception as e:
             return {"status": "error", "message": str(e)}, 500
@@ -387,4 +391,5 @@ api.add_resource(RegisterTransferThird, '/transfers/api/third/notify')
 api.add_resource(Heartbeat, '/api/info')
 
 if __name__ == '__main__':
+    sys.stderr.write(f"Starting Citizen Transfer Service on port {Config.PORT}")
     app.run(host='0.0.0.0', debug=True, port=Config.PORT)
