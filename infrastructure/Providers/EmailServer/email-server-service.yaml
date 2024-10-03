@@ -4,7 +4,7 @@ metadata:
   labels:
     app: email-server-mailhog
   name: email-server-mailhog
-  namespace: ambassador-test
+  namespace: citizens-folder
 spec:
   type: ClusterIP
   selector:

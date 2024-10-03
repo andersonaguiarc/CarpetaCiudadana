@@ -4,12 +4,12 @@ metadata:
   labels:
     app: email-server-mailhog
   name: email-server-mailhog-mailhog
-  namespace: ambassador-test
+  namespace: citizens-folder
 spec:
-  virtualhost:
-    fqdn: mailhog.ambassadors.ink
-    tls:
-      secretName: mailhog-ambassador-tls
+  #virtualhost:
+  #  fqdn: mailhog.ambassadors.ink
+  #  tls:
+  #    secretName: mailhog-ambassador-tls
   routes:
     - conditions:
       - prefix: /

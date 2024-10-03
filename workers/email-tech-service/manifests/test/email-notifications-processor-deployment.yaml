@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email-notifications-processor
+  namespace: citizens-folder
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: email-notifications-processor
+  template:
+    metadata:
+      labels:
+        app: email-notifications-processor
+    spec:
+      containers:
+      - name: email-notifications-processor
+        image: spbpatino/citizens-folder-email-technical-service-worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: email-notifications-processor
+        - secretRef:
+            name: email-notifications-processor
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
