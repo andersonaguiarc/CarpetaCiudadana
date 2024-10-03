@@ -30,6 +30,7 @@ export class RegisterComponent {
   onRegister(): void {
     if (this.registerForm.invalid) {
       console.error("Formulario inválido");
+      alert('Revise los campos llenados')
       return;
     }
 
@@ -53,10 +54,12 @@ export class RegisterComponent {
     .subscribe({
       next: (response) => {
         console.log('Usuario registrado con éxito', response); 
+        alert('Usuario registrado con éxito');
         this.router.navigate(['/login']);
       },
       error: (error) => {
         console.error('Error al registrar usuario:', error);
+        alert('No se recibio respuesta del servidor, el usuario no fue creado, intentelo de nuevo mas tarde');
       }
     });
   }

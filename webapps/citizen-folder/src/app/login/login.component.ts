@@ -52,6 +52,7 @@ export class LoginComponent {
       },
       error: (error) => {
         console.error('Error al iniciar sesión:', error);
+        alert('Error al iniciar sesión, por favor verifica tus credenciales.');
         this.errorMessage = 'Error al iniciar sesión, por favor verifica tus credenciales.';
       }
     });
