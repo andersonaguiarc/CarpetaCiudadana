@@ -103,12 +103,14 @@ class CitizensTransfer():
 
     @circuit(failure_threshold=2)
     def request_third_party_operator(self, operator_url, documents_response, citizen_response):
-        response = requests.post(operator_url, json={
+        citizen_to_send = {
                     **documents_response.json(),
                     "citizenName": citizen_response.json()["name"],
                     "citizenEmail": citizen_response.json()["email"],
                     "confirmationURL": Config.CONFIRMATION_URL
-                })
+                }
+        print("Citizen to send", citizen_to_send, flush=True)
+        response = requests.post(operator_url, json=citizen_to_send)
         response.raise_for_status()
         return response
 
@@ -202,13 +204,27 @@ class CitizensTransfer():
 
 # API para recibir el mensaje del worker y continuar el procesamiento en Documents
 class CitizensTransferContinueDocuments(Resource):
+    @circuit(failure_threshold=2)
+    def request_third_party_operator(self, operator_url, documents_response, citizen_response):
+        citizen_to_send = {
+                    **documents_response.json(),
+                    "citizenName": citizen_response["name"],
+                    "citizenEmail": citizen_response["email"],
+                    "confirmationURL": Config.CONFIRMATION_URL
+                }
+        print("Citizen to send", citizen_to_send, flush=True)
+        response = requests.post(operator_url, json=citizen_to_send)
+        print("Respuesta del servicio tercero en servicio de third_party_operator_response ... ",response, flush=True)
+        response.raise_for_status()
+        return response
+
     def post(self):
         try:
             # Verificar si el cuerpo de la petición contiene datos JSON
             citizen_response = request.get_json()
 
-            citizen_id = citizen_response['citizen_id']
-            operator_url = citizen_response['operator_url']
+            citizen_id = citizen_response['id']
+            operator_url = citizen_response['operatorUrl']
 
             try:
                 # Llamado al servicio de Documents
@@ -231,6 +247,7 @@ class CitizensTransferContinueDocuments(Resource):
             return {"message": f"El ciudadano {citizen_id} ha sido transferido al {operator_url} de forma exitosa."}, 200
 
         except Exception as e:
+            print(f"Error en la petición: {str(e)}", flush=True)
             return {"message": str(e)}, 500
         
 # API para recibir el mensaje del worker register_transfer_citizen y continuar el procesamiento en Documents

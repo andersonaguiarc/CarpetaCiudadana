@@ -569,7 +569,7 @@
             ]
         },
         {
-            "endpoint": "test1/api/transferCitizen",
+            "endpoint": "test/api/transferCitizen",
             "input_headers": [
                 "*"
             ],

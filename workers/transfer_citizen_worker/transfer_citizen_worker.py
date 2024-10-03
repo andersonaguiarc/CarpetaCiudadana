@@ -7,7 +7,6 @@ from config import Config
 
 # Función para procesar el mensaje recibido de RabbitMQ
 def callback(
-        self,
         ch: BlockingChannel,
         method: Basic.Deliver,
         _: BasicProperties,
