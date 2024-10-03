@@ -16,6 +16,7 @@ def token_required(f):
 
         claims = jwt.decode(token, options={"verify_signature": False})
         g.user_id = claims["id"]
+        g.user_email = claims["email"]
 
         return f(*args, **kwargs)
 

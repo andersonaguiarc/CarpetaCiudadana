@@ -27,6 +27,7 @@ class Consumer:
                 "idCitizen": body["user_id"],
                 "UrlDocument": body["url"],
                 "documentTitle": body["file_name"],
+                "email": body["user_email"],
             },
         )
         govcarpeta_response.raise_for_status()

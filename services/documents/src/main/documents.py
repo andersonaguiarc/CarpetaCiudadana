@@ -136,6 +136,12 @@ def main():
     if not amqp_routing_key:
         raise ValueError("AMQP_ROUTING_KEY environment variable is required.")
 
+    amqp_queue_to_certify_email = os.getenv("AMQP_QUEUE_TO_CERTIFY_EMAIL")
+    if not amqp_queue_to_certify_email:
+        raise ValueError(
+            "AMQP_QUEUE_TO_CERTIFY_EMAIL environment variable is required."
+        )
+
     handler = Handler(
         db,
         amqp_connection.channel(),
@@ -143,6 +149,7 @@ def main():
         amqp_routing_key,
         files_url,
         govcarpeta_url,
+        amqp_queue_to_certify_email,
     )
 
     port = int(os.getenv("PORT", "8080"))

@@ -30,6 +30,7 @@ class Handler:
         amqp_routing_key,
         files_url,
         govcarpeta_url,
+        queue_to_certify_email,
     ):
         self.db = db
         self.amqp_channel = amqp_channel
@@ -38,9 +39,10 @@ class Handler:
         self.documents = db.documents
         self.files_url = files_url
         self.govcarpeta_url = govcarpeta_url
+        self.queue_to_certify_email = queue_to_certify_email
 
     @circuit(failure_threshold=2)
-    def certify(self, response, user_id, file_name):
+    def certify(self, response, user_id, file_name, email_body):
         govcarpeta_response = requests.put(
             f"{self.govcarpeta_url}/apis/authenticateDocument",
             json={
@@ -59,10 +61,16 @@ class Handler:
             },
         )
         print(govcarpeta_response.json(), flush=True)
+        self.amqp_channel.basic_publish(
+            exchange=self.queue_to_certify_email,
+            routing_key=self.queue_to_certify_email,
+            body=email_body,
+        )
 
     @token_required
     def certify_document(self, file_name):
         user_id = g.user_id
+        user_email = g.user_email
         if not self._document_exists(file_name, user_id):
             return jsonify({"error": "document not found"}), 404
 
@@ -83,6 +91,7 @@ class Handler:
                 "user_id": user_id,
                 "file_name": file_name,
                 "url": response.json()["url"],
+                "user_email": user_email,
             }
             message = json.dumps(body)
             self.amqp_channel.basic_publish(
@@ -100,7 +109,12 @@ class Handler:
             )
 
         try:
-            self.certify(response, user_id, file_name)
+            email_body = {
+                "email": user_email,
+                "subject": "Document Certification",
+                "message": f"Document '{file_name}' certified successfully",
+            }
+            self.certify(response, user_id, file_name, email_body)
             return jsonify({"message": "document certification successful"}), 200
         except Exception as err:
             print(err, flush=True)
@@ -122,6 +136,7 @@ class Handler:
                 idCitizen: int
                 UrlDocument: str
                 documentTitle: str
+                email: str
 
             certification_request = CertificationRequest(**data)
 
@@ -147,6 +162,15 @@ class Handler:
             print(
                 f"Certified document: {govcarpeta_response.json()}",
                 flush=True,
+            )
+            self.amqp_channel.basic_publish(
+                exchange=self.queue_to_certify_email,
+                routing_key=self.queue_to_certify_email,
+                body={
+                    "email": certification_request.email,
+                    "subject": "Document Certification",
+                    "message": f"Document '{certification_request.documentTitle}' certified successfully",
+                },
             )
             return jsonify({"message": "document certification successful"}), 200
         except Exception as err:
@@ -439,7 +463,7 @@ class Handler:
             "user_id": int(user_id),
         }
 
-        print("query",query, flush=True)
+        print("query", query, flush=True)
 
         try:
             self.documents.delete_many(query)
