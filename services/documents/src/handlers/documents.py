@@ -301,6 +301,8 @@ class Handler:
 
         body = request.get_json()
 
+        print("Body Transfer Documents", body, flush=True)
+
         if body is None:
             return jsonify({"error": "no body provided"}), 400
 

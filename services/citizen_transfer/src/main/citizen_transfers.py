@@ -262,12 +262,13 @@ class RegisterTransferDocuments(Resource):
             citizen_worker_response['confirmationURL'] = citizen_worker_response.pop('operatorUrl')
             citizen_worker_response.pop('address', None)
 
-            message_documents = json.dumps(citizen_worker_response)
+            message_documents = citizen_worker_response
             register_documents_url = Config.REGISTER_DOCUMENTS_API_URL
             try:
                 print("message_documents", message_documents, flush=True)
                 register_documents_response = requests.post(register_documents_url, json=message_documents)
                 print("register_documents_response", register_documents_response.json(), flush=True)
+                register_documents_response.raise_for_status()
             except Exception as err:
                 print("Error en llamado al servicio de documents ",err, flush=True)
                 exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_DOCUMENTS
@@ -282,6 +283,7 @@ class RegisterTransferDocuments(Resource):
                 print("message_third", message_third, flush=True)
                 register_third_response = requests.post(operator_url, json=message_third)
                 print("register_third_response", register_third_response.json(), flush=True)
+                register_third_response.raise_for_status()
             except Exception as err:
                 print("Error en llamado al servicio de third ",err, flush=True)
                 exchange=f"delayed_{Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_THIRD}"
@@ -315,6 +317,7 @@ class RegisterTransferThird(Resource):
                 print("message_third", message_third, flush=True)
                 register_third_response = requests.post(operator_url, json=message_third)
                 print("register_third_response", register_third_response.json(), flush=True)
+                register_third_response.raise_for_status()
             except Exception as err:
                 print("Error en llamado al servicio de third ",err, flush=True)
                 return {"message": "Confirmación al operador externo en proceso", "details": str(err)}, 500
@@ -374,6 +377,7 @@ class RegisterTransferedCitizen(Resource):
         try:
             print("message_citizen", message_citizen, flush=True)
             register_citizen_response = self.request_register_transfered_citizen(register_citizen_url, message_citizen)
+            print("register_citizen_response", register_citizen_response.json(), flush=True)
         except Exception as err:
             print("Error en llamado al servicio de citizens ",err, flush=True)
             exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_CITIZEN
@@ -393,6 +397,7 @@ class RegisterTransferedCitizen(Resource):
         try:
             print("message_documents", message_documents, flush=True)
             register_documents_response = self.request_register_transfered_documents(register_documents_url, message_documents)
+            print("register_documents_response", register_documents_response.json(), flush=True)
         except Exception as err:
             print("Error en llamado al servicio de documents ",err, flush=True)
             exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_DOCUMENTS
@@ -405,11 +410,11 @@ class RegisterTransferedCitizen(Resource):
         try:
             print("message_third", message_third, flush=True)
             register_third_response = self.request_register_transfered_documents(operator_url, message_third)
+            print("register_third_response", register_third_response.json(), flush=True)
         except Exception as err:
             print("Error en llamado al servicio de third ",err, flush=True)
             exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_THIRD
-            routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_THIRD
-            send_to_rabbitmq_third(message_third, exchange, routing_key)
+            send_to_rabbitmq_third(message_third, exchange, exchange)
             return {"message": "Confirmación al operador externo en proceso", "details": str(err)}, 200
         
 
