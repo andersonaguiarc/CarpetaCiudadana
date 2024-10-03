@@ -10,15 +10,16 @@ data:
   PORT: "8450"
   EXCHANGE_NAME_TRANSER_TO_CITIZEN: citizen_to_delete_and_transfer
   ROUTINGKEY_NAME_TRANSFER_TO_CITIZEN: citizen_to_delete_and_transfer
-  EXCHANGE_NAME_TRANSER_TO_DOCUMENT: delayed_citizen_to_delete_and_transfer_replier
-  EXCHANGE_NAME_CITIZEN_TO_CONFIRM: citizen_to_confirm
-  ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT: delayed_citizen_to_delete_and_transfer_replier
   QUEUE_NAME_CITIZEN_TO_TRANSFER_REPLIER: citizen_to_delete_and_transfer_replier
-  QUEUE_NAME_EXTERNAL_CITIZEN_TO_REGISTER: external_citizen_to_register
-  QUEUE_NAME_REGISTER_TRANSFER_TO_CITIZEN: citizen_registered_transfers_replier
-  QUEUE_NAME_REGISTER_TRANSFER_TO_DOCUMENT: documents_to_register_replier
+  #EXCHANGE_NAME_TRANSER_TO_DOCUMENT: delayed_citizen_to_delete_and_transfer_replier
+  #EXCHANGE_NAME_CITIZEN_TO_CONFIRM: citizen_to_confirm
+  #ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT: delayed_citizen_to_delete_and_transfer_replier
+  #QUEUE_NAME_EXTERNAL_CITIZEN_TO_REGISTER: external_citizen_to_register
+  #QUEUE_NAME_REGISTER_TRANSFER_TO_CITIZEN: citizen_registered_transfers_replier
+  #QUEUE_NAME_REGISTER_TRANSFER_TO_DOCUMENT: documents_to_register_replier
   EXCHANGE_NAME_REGISTER_TRANSFER_TO_DOCUMENTS: documents_to_register
   ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_DOCUMENTS: documents_to_register
+  CONFIRMATION_URL: https://api.fastidentify.com/transfers/api/confirmTransfer
   CITIZEN_TRANSFER_API_BASE_URL: http://citizens-transfer-api
   CITIZEN_API_URL: http://users-api
   DOCUMENT_API_URL: http://documents-api

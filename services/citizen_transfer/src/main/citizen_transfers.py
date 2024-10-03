@@ -106,7 +106,8 @@ class CitizensTransfer():
         response = requests.post(operator_url, json={
                     **documents_response.json(),
                     "citizenName": citizen_response.json()["name"],
-                    "citizenEmail": citizen_response.json()["email"]
+                    "citizenEmail": citizen_response.json()["email"],
+                    "confirmationURL": Config.CONFIRMATION_URL
                 })
         response.raise_for_status()
         return response
@@ -168,9 +169,10 @@ class CitizensTransfer():
                 print(f"Respuesta servicio de documents... ",documents_response.json(), flush=True)
             except Exception as err:
                 print(f"Error servicio de documents... ",err, flush=True)
-                exchange=Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT
-                routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT
-                send_to_rabbitmq_document(citizen_response.json(), exchange, routing_key)
+                exchange=f"delayed_{Config.QUEUE_NAME_CITIZEN_TO_TRANSFER_REPLIER}"
+                citizen_to_register = citizen_response.json()
+                citizen_to_register['operatorUrl'] = operator_url
+                send_to_rabbitmq_citizen(citizen_to_register, exchange, exchange)
                 return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
 
             # Consumo del servicio operador externo
@@ -179,11 +181,10 @@ class CitizensTransfer():
                 print("Respuesta servicio de third_party_operator_response... ",third_party_operator_response.json(), flush=True)
             except Exception as err:
                 print("Error servicio de third_party_operator_response... ",err, flush=True)
-                exchange=Config.EXCHANGE_NAME_TRANSER_TO_DOCUMENT
-                routing_key=Config.ROUTINGKEY_NAME_TRANSFER_TO_DOCUMENT
-                citizen_to_enqueue = citizen_response.json()
-                citizen_to_enqueue['operatorUrl'] = operator_url
-                send_to_rabbitmq_document(citizen_to_enqueue, exchange, routing_key)
+                exchange=f"delayed_{Config.QUEUE_NAME_CITIZEN_TO_TRANSFER_REPLIER}"
+                citizen_to_register = citizen_response.json()
+                citizen_to_register['operatorUrl'] = operator_url
+                send_to_rabbitmq_citizen(citizen_to_register, exchange, exchange)
                 return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
 
             return {"message": f"El ciudadano {citizen_id} ha sido transferido al {operator_id} de forma exitosa."}, 200
@@ -214,8 +215,9 @@ class CitizensTransferContinueDocuments(Resource):
                 documents_service_url = Config.DOCUMENT_API_URL
                 documents_response = requests.post(f"{documents_service_url}/api/v1/documents/files/{citizen_id}")
             except Exception as err:
-                send_to_rabbitmq_document(citizen_response.json())
-                return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
+                #send_to_rabbitmq_document(citizen_response.json())
+                print("Error servicio de documents Resiliencia... ",err, flush=True)
+                return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 500
 
             try:
                 # Llamado al servicio del operador externo
@@ -223,8 +225,8 @@ class CitizensTransferContinueDocuments(Resource):
                 print("Respuesta servicio de third_party_operator_response Resiliencia... ",third_party_operator_response.json(), flush=True)
             except Exception as err:
                 print("Error servicio de third_party_operator_response Resiliencia... ",err, flush=True)
-                send_to_rabbitmq_document(citizen_response.json())
-                return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 200
+                #send_to_rabbitmq_document(citizen_response.json())
+                return {"message": f"Transferencia del ciudadano {citizen_id} en proceso", "details": str(err)}, 500
 
             return {"message": f"El ciudadano {citizen_id} ha sido transferido al {operator_url} de forma exitosa."}, 200
 

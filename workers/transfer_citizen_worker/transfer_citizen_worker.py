@@ -1,10 +1,18 @@
 import pika
 import requests
 import json
+from pika.adapters.blocking_connection import BlockingChannel
+from pika.spec import Basic, BasicProperties
 from config import Config
 
 # Función para procesar el mensaje recibido de RabbitMQ
-def callback(ch, method, properties, body):
+def callback(
+        self,
+        ch: BlockingChannel,
+        method: Basic.Deliver,
+        _: BasicProperties,
+        body: bytes,
+    ) -> None:
     try:
         # Convertir el mensaje de la cola a un diccionario de Python
         message = json.loads(body)
@@ -19,13 +27,19 @@ def callback(ch, method, properties, body):
 
         # Enviar el mensaje al servicio CitizensTransfer para continuar el procesamiento
         response = requests.post(citizens_transfer_url, json=payload)
-
+        print(f"response: {response}", flush=True)
+        print(f"delivery_tag: {method.delivery_tag}", flush=True)
         if response.status_code == 200:
+            ch.basic_ack(delivery_tag=method.delivery_tag)
             print(f"Procesado correctamente el mensaje para el ciudadano {citizen_id}", flush=True)
         else:
+            ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False, multiple=False)
+            delay_queue = f"delayed_{Config.QUEUE_NAME_CITIZEN_TO_TRANSFER_REPLIER}"
+            ch.basic_publish(exchange=delay_queue, routing_key=delay_queue, body=json.dumps(message))
             print(f"Error al procesar el ciudadano {citizen_id}. Detalles: {response.text}", flush=True)
 
     except Exception as e:
+        #todo: enviar a una cola de errores
         print(f"Error al procesar el mensaje: {str(e)}", flush=True)
 
 # Configuración de RabbitMQ
@@ -47,7 +61,11 @@ def start_worker():
         print(f"Esperando mensajes de la cola {queue_name}...", flush=True)
 
         # Configurar el callback cuando llega un mensaje
-        channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
+        channel.basic_consume(
+            queue=queue_name,
+            on_message_callback=callback,
+            auto_ack=False,
+        )
 
         # Empezar a consumir mensajes
         channel.start_consuming()
