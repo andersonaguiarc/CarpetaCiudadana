@@ -265,8 +265,11 @@ class RegisterTransferDocuments(Resource):
             message_documents = json.dumps(citizen_worker_response)
             register_documents_url = Config.REGISTER_DOCUMENTS_API_URL
             try:
+                print("message_documents", message_documents, flush=True)
                 register_documents_response = requests.post(register_documents_url, json=message_documents)
+                print("register_documents_response", register_documents_response.json(), flush=True)
             except Exception as err:
+                print("Error en llamado al servicio de documents ",err, flush=True)
                 exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_DOCUMENTS
                 routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_DOCUMENTS
                 send_to_rabbitmq_document(message_documents, exchange, routing_key)
@@ -274,13 +277,16 @@ class RegisterTransferDocuments(Resource):
             
             # Confirmar al Operador tercero la transferencia exitosa
             operator_url = citizen_worker_response['confirmationURL']
-            message_third = json.dumps({"message": "Citizen received"})
+            message_third = {"id": citizen_worker_response['id']}
             try:
-                register_third_response = requests.post(operator_url, message_third)
+                print("message_third", message_third, flush=True)
+                register_third_response = requests.post(operator_url, json=message_third)
+                print("register_third_response", register_third_response.json(), flush=True)
             except Exception as err:
-                exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_THIRD
-                routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_THIRD
-                send_to_rabbitmq_third(message_third, exchange, routing_key)
+                print("Error en llamado al servicio de third ",err, flush=True)
+                exchange=f"delayed_{Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_THIRD}"
+                message_third['confirmationURL'] = operator_url
+                send_to_rabbitmq_third(message_third, exchange, exchange)
                 return {"message": "Confirmación al operador externo en proceso", "details": str(err)}, 200
             
             return {"message": "Citizen received"}, 200
@@ -292,28 +298,31 @@ class RegisterTransferDocuments(Resource):
 class RegisterTransferThird(Resource):
     def post(self):
         try:
-            document_worker_response = request.get_json()
+            citizen_to_confirm = request.get_json()
 
-
-            message_documents = json.dumps(document_worker_response)
-            register_documents_url = Config.REGISTER_DOCUMENTS_API_URL
-    
+            print("citizen_to_confirm", citizen_to_confirm, flush=True)
             
             # Confirmar al Operador tercero la transferencia exitosa
-            operator_url = message_documents['operatorURL']
-            id = message_documents['idCitizen']
-            message_third = json.dumps({"id": id})
+            if 'operatorURL' in citizen_to_confirm:
+                operator_url = citizen_to_confirm['operatorURL']
+            else:
+                operator_url = citizen_to_confirm['confirmationURL']
+            
+            id = citizen_to_confirm['id']
+
+            message_third = {"id": id}
             try:
-                register_third_response = requests.post(operator_url, message_third)
+                print("message_third", message_third, flush=True)
+                register_third_response = requests.post(operator_url, json=message_third)
+                print("register_third_response", register_third_response.json(), flush=True)
             except Exception as err:
-                exchange=Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_THIRD
-                routing_key=Config.ROUTINGKEY_NAME_REGISTER_TRANSFER_TO_THIRD
-                send_to_rabbitmq_third(message_third, exchange, routing_key)
-                return {"message": "Confirmación al operador externo en proceso", "details": str(err)}, 200
+                print("Error en llamado al servicio de third ",err, flush=True)
+                return {"message": "Confirmación al operador externo en proceso", "details": str(err)}, 500
             
             return {"message": "Success Notify"}, 200
 
         except Exception as e:
+            print(f"Error en la petición: {str(e)}", flush=True)
             return {"message": str(e)}, 500
         
 

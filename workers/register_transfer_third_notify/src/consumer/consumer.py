@@ -23,7 +23,7 @@ class Consumer:
     def transfer(self, body: Dict) -> None:
         documents_response = requests.post(
             f"{self.documents_url}/transfers/api/third/notify",
-            body,
+            json=body,
         )
         documents_response.raise_for_status()
         print(

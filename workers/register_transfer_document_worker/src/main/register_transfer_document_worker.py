@@ -17,19 +17,31 @@ def callback(ch, method, properties, body):
         message = json.loads(body)
         operatorUrl = message['confirmationURL']
         idCitizen = message['id']
-        message_third = {"operatorURL":operatorUrl, "idCitizen":idCitizen}
+        message_third = {"operatorURL":operatorUrl, "id":idCitizen}
         message_third_formated = json.dumps(message_third)     
         register_transfer_third_url = Config.REGISTER_TRANSFER_THIRD_API_URL
         # Enviar el mensaje directamente sin desempaquetar
         register_transfer_third_response = requests.post(register_transfer_third_url, json=message_third_formated)
 
         register_transfer_third_response.raise_for_status()
+       
+        ch.basic_ack(delivery_tag=method.delivery_tag)
         print(
             f"Notify third-party sent: {register_transfer_third_response.json()}",
             flush=True,
         )
 
     except Exception as e:
+
+        ch.basic_nack(
+                delivery_tag=method.delivery_tag, requeue=False, multiple=False
+            )
+
+        ch.basic_publish(
+            exchange=f"delayed_{Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_THIRD}",
+            routing_key=f"delayed_{Config.EXCHANGE_NAME_REGISTER_TRANSFER_TO_THIRD}",
+            body=message,
+        )
         print(f"Error al procesar el mensaje de la cola: {str(e)}", flush=True)
 
 # Configuración de RabbitMQ

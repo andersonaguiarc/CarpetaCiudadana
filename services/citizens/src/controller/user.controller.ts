@@ -127,7 +127,7 @@ export const Register = async (req: Request, res: Response) => {
             const userCreated = { ...user };
             userCreated['operatorUrl'] = req.body.operatorUrl;
             console.log('User created to send to transfers replier ... ', userCreated);
-            if (req.body.mustSendDocuments) userCreated['Documents'] = req.body.Documents;
+            if (req.body.mustSendDocuments) userCreated['Documents'] = req.body.documents;
             await publishMessage(EXCHANGE_NAME_TRANSFERS_REPLIER, 'direct', ROUTING_KEY_TRANSFERS_REPLIER, JSON.stringify(userCreated));
         }
 

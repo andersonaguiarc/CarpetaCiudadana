@@ -45,24 +45,72 @@ spec:
             path: /api/info
             port: 8450
 
-      #- name: citizens-transfer-external-citizen-processor
-      #  image: spbpatino/citizens-folder-transfer-external-citizen-worker:latest
-      #  imagePullPolicy: Always
-      #  envFrom:
-      #  - configMapRef:
-      #      name: citizens-transfer-api
-      #  - secretRef:
-      #      name: citizens-transfer-api
-      #  resources:
-      #    requests:
-      #      cpu: "50m"
-      #      memory: "128Mi"
-      #    limits:
-      #      cpu: "500m"
-      #      memory: "512Mi"
+      - name: citizens-transfer-external-citizen-processor
+        image: spbpatino/citizens-folder-transfer-external-citizen-worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: citizens-transfer-api
+        - secretRef:
+            name: citizens-transfer-api
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
 
       - name: transfer-citizen-processor
         image: spbpatino/citizens-folder-transfer-citizen-worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: citizens-transfer-api
+        - secretRef:
+            name: citizens-transfer-api
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+      
+      - name: register-transfer-citizen-processor
+        image: spbpatino/citizens-folder-register_transfer_citizen_worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: citizens-transfer-api
+        - secretRef:
+            name: citizens-transfer-api
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+      
+      - name: citizens-transfer-register-transfer-documents-processor
+        image: spbpatino/citizens-folder-register-transfer-documents-worker:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: citizens-transfer-api
+        - secretRef:
+            name: citizens-transfer-api
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+            
+      - name: transfer-citizen-register-transfer-third-notify-processor
+        image: spbpatino/citizens-transfer-register-transfer-third-notify-worker:latest
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
@@ -93,35 +141,7 @@ spec:
       #      cpu: "500m"
       #      memory: "512Mi"
       #      
-      #- name: citizens-transfer-register-transfer-documents-processor
-      #  image: spbpatino/citizens-folder-register-transfer-documents-worker:latest
-      #  imagePullPolicy: Always
-      #  envFrom:
-      #  - configMapRef:
-      #      name: citizens-transfer-api
-      #  - secretRef:
-      #      name: citizens-transfer-api
-      #  resources:
-      #    requests:
-      #      cpu: "50m"
-      #      memory: "128Mi"
-      #    limits:
-      #      cpu: "500m"
-      #      memory: "512Mi"
+     
       #
       #
-      #- name: transfer-citizen-register-transfer-third-notify-processor
-      #  image: spbpatino/citizens-transfer-register-transfer-third-notify-worker:latest
-      #  imagePullPolicy: Always
-      #  envFrom:
-      #  - configMapRef:
-      #      name: citizens-transfer-api
-      #  - secretRef:
-      #      name: citizens-transfer-api
-      #  resources:
-      #    requests:
-      #      cpu: "50m"
-      #      memory: "128Mi"
-      #    limits:
-      #      cpu: "500m"
-      #      memory: "512Mi"
+      

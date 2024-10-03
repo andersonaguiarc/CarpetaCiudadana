@@ -13,35 +13,46 @@ let channel: amqp.Channel;
 const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
     if (msg) {
         const messageContent = msg.content.toString();
-        const parsedMessage = JSON.parse(messageContent);
-        console.log('Received message:', parsedMessage);
+        let parsedMessage = JSON.parse(messageContent);
+        console.log('Received message:', typeof parsedMessage, parsedMessage);
+        if(typeof parsedMessage === 'string') parsedMessage = JSON.parse(parsedMessage);
+        try {
 
 
-        const options = {
-            timeout: 3000,
-            errorThresholdPercentage: 50,
-            resetTimeout: 30000
-        };
+            const options = {
+                timeout: 3000,
+                errorThresholdPercentage: 50,
+                resetTimeout: 30000
+            };
 
-        parsedMessage.notifyRegistrationToTransfers = !!parsedMessage.operatorUrl;
-        parsedMessage.mustSendDocuments = !!parsedMessage.Documents;
+            parsedMessage['notifyRegistrationToTransfers'] = !!parsedMessage.operatorUrl;
+            parsedMessage['mustSendDocuments'] = !!parsedMessage.documents;
 
-        const breaker = new CircuitBreaker(axios.post, options);
-        await breaker.fire(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/register`, parsedMessage)
-            .then(function (response) {
-                console.log('User registered with success', response.data);
-                channel.ack(msg);
+            const breaker = new CircuitBreaker(axios.post, options);
+            await breaker.fire(`${process.env.CITIZENS_MICROSERVICE_URL}/api/citizens/register`, parsedMessage)
+                .then(function (response) {
+                    console.log('User registered with success', response.data);
+                    channel.ack(msg);
 
-            })
-            .catch(await async function (error) {
-                console.log('Failed to register user', error.response.data);
-                channel.nack(msg, false, false);
+                })
+                .catch(await async function (error) {
+                    console.log('Failed to register user', error.response.data);
+                    channel.nack(msg, false, false);
 
-                const DELAYED_QUEUE_NAME = 'delayed_citizen_to_register';
+                    const DELAYED_QUEUE_NAME = 'delayed_citizen_to_register';
 
-                await publishMessage(DELAYED_QUEUE_NAME, 'direct', DELAYED_QUEUE_NAME, JSON.stringify(parsedMessage));
+                    await publishMessage(DELAYED_QUEUE_NAME, 'direct', DELAYED_QUEUE_NAME, JSON.stringify(parsedMessage));
 
-            });
+                });
+        } catch (error) {
+            console.log('CATCH Failed to register user', error);
+            channel.nack(msg, false, false);
+
+            const DELAYED_QUEUE_NAME = 'delayed_citizen_to_register';
+
+            await publishMessage(DELAYED_QUEUE_NAME, 'direct', DELAYED_QUEUE_NAME, JSON.stringify(parsedMessage));
+        }
+
 
 
     }

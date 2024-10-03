@@ -1,7 +1,5 @@
 FROM python:3.10.5-slim-buster
 
-RUN apt-get update && apt-get install -y curl
-
 WORKDIR /app
 
 COPY requirements.txt requirements.txt
@@ -12,4 +10,4 @@ COPY . .
 
 ENV PYTHONPATH "/app"
 
-CMD ["python3", "register_transfer_citizen_worker.py"]
+CMD ["python3", "src/main/register_transfer_citizen_worker.py"]
