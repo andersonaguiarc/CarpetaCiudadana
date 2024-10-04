@@ -364,6 +364,7 @@ class RegisterTransferedCitizen(Resource):
         register_transfered_citizen.pop('Documents', None)
         register_transfered_citizen['address'] = 'Transfered'
         register_transfered_citizen['operatorUrl'] = register_transfered_citizen.pop('confirmationURL')
+        register_transfered_citizen['transferedUser'] = True
 
         # Convertir el diccionario actualizado en un JSON string
         message_citizen = register_transfered_citizen

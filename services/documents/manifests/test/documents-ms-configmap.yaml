@@ -18,3 +18,4 @@ data:
   AMQP_DELETE_USER_FROM_ALL_SYSTEM_ROUTING_KEY: delete_user_from_all_system
   QUEUE_NAME_DOCUMENTS_TO_REGISTER: documents_to_register
   QUEUE_NAME_DOCUMENTS_TO_REGISTER_REPLIER: documents_to_register_replier
+  AMQP_QUEUE_TO_CERTIFY_EMAIL: message_to_email
