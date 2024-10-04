@@ -1,0 +1,1 @@
+export const localTime = `[${new Date().toLocaleString('en-US', { timeZone: 'America/Bogota' })}]`;

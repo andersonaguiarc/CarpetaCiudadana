@@ -25,8 +25,8 @@ export const Info = async (req: Request, res: Response) => {
 }
 
 export const Register = async (req: Request, res: Response) => {
+    console.log("Body to register", req.body)
     const { password, password_confirm, email, id } = req.body;
-
     if (password !== password_confirm) {
         console.error(`${new Date().toLocaleString()}: Passwords do not match`);
         return res.status(400).send({

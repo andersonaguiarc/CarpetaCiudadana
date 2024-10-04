@@ -119,7 +119,7 @@ export const Register = async (req: Request, res: Response) => {
         const EXCHANGE_NAME = 'citizen_to_update';
         const ROUTING_KEY = 'citizen_to_update';
 
-        await publishMessage(EXCHANGE_NAME, EXCHANGE_TYPE, ROUTING_KEY, value);
+        //await publishMessage(EXCHANGE_NAME, EXCHANGE_TYPE, ROUTING_KEY, value);
 
         if (requestFromTransfers && req.body.operatorUrl) {
             const EXCHANGE_NAME_TRANSFERS_REPLIER = 'citizen_registered_transfers_replier';
@@ -129,8 +129,23 @@ export const Register = async (req: Request, res: Response) => {
             console.log('User created to send to transfers replier ... ', userCreated);
             if (req.body.mustSendDocuments) userCreated['Documents'] = req.body.documents;
             await publishMessage(EXCHANGE_NAME_TRANSFERS_REPLIER, 'direct', ROUTING_KEY_TRANSFERS_REPLIER, JSON.stringify(userCreated));
+            
         }
+        console.log('User created ... ', user);
+        if(requestFromTransfers || !!req.body.transferedUser) {
 
+            const REGISTER_TO_AUTH_QUEUE = 'register_to_auth';
+            console.log('User created to send to auth ... ', user);
+            await publishMessage(EXCHANGE_NAME, EXCHANGE_TYPE, REGISTER_TO_AUTH_QUEUE, JSON.stringify(user));
+            
+        }
+        const NOTIFICATION_EMAIL_QUEUE = 'message_to_email';
+        const emailToSend = {
+            email: user.email
+            , subject: 'Registro exitoso'
+            , message: 'Su registro ha sido exitoso en el operador Fastidentify'
+        }
+        await publishMessage(NOTIFICATION_EMAIL_QUEUE, 'direct', NOTIFICATION_EMAIL_QUEUE, JSON.stringify(emailToSend));
         res.send(user);
 
     } catch (e) {
