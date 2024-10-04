@@ -6,6 +6,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http'; // Importamos HttpClientModule y provideHttpClient
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MainPageComponent } from './main-page/main-page.component';
@@ -39,7 +41,15 @@ import { ProcesoTransferenciaComponent } from './proceso-transferencia/proceso-t
     RouterModule,
     ReactiveFormsModule,
     HttpClientModule,  // Asegúrate de importar HttpClientModule
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule, // Requerido para las animaciones de ngx-toastr
+    ToastrModule.forRoot({
+      positionClass: 'toast-center', // Posición del toast
+      timeOut: 0, // Duración de la notificación en milisegundos
+      closeButton: true,
+      preventDuplicates: true
+    })
+
   ],
   providers: [
     provideClientHydration(),

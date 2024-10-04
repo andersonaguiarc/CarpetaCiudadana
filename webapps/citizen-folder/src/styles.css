@@ -117,3 +117,83 @@ input {
     font-weight: bold;
     margin-bottom: 20px;
 }
+
+
+
+/* Estilos para el contenedor del toast */
+
+.toast-center {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--colorFondo); /* Color del fondo principal del toast */
+    padding: 16px;
+    width: 90%;
+    max-width: 500px;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    flex-direction: column; /* Alinear el contenido verticalmente */
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+    transition: opacity 0.3s ease-out, visibility 0.3s ease-out; /* Transición suave */
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Cuando el toast está oculto */
+.toast-center.hide {
+    opacity: 0; /* Desaparecer el toast */
+    visibility: hidden; /* Ocultarlo completamente después de la transición */
+    transition: opacity 0.3s ease-in, visibility 0.3s ease-in;
+}
+
+/* Contenedor del mensaje */
+.toast-error {
+    background-color: #fdcfcf; /* Fondo para el mensaje de error */
+    border: 1px solid black; /* Borde negro para resaltar el cuadro */
+    border-radius: 5px; /* Bordes redondeados */
+    padding: 12px;
+    width: 100%; /* Ocupar todo el espacio disponible */
+    text-align: center; /* Centrar el texto */
+    margin-bottom: 10px; /* Separación del botón de cierre */
+}
+
+/* Texto del mensaje */
+.toast-message {
+    color: black; /* Texto negro para que sea legible */
+    font-size: 14px;
+}
+
+/* Estilo del botón de cierre */
+.toast-close-button {
+    font-size: 16px;
+    color: white;
+    cursor: pointer;
+    background-color: #3a8ca5;
+    border: none;
+    border-radius: 50%; /* Botón redondeado */
+    padding: 10px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease;
+    margin-top: 5px; /* Separación entre el mensaje y el botón */
+}
+
+/* Cambiar el color del botón al hacer hover */
+.toast-close-button:hover {
+    background-color: #2980b9;
+}
+
+
+
+
+
+
+  
+  

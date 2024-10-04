@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -20,12 +21,47 @@ export class LoginComponent {
     @Inject(PLATFORM_ID) private platformId: Object,
     private fb: FormBuilder,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  showToast(message: string, title: string, type: 'success' | 'error'): void {
+    const toastElement = document.querySelector('.toast-center');
+    if (toastElement) {
+      toastElement.classList.remove('hide'); // Muestra el toast
+    }
+
+    if (type === 'success') {
+      this.toastr.success(message, title, {
+        disableTimeOut: true,
+        closeButton: true,
+        positionClass: 'toast-center'
+      }).onHidden.subscribe(() => {
+        this.hideToast();
+      });
+    } else if (type === 'error') {
+      this.toastr.error(message, title, {
+        disableTimeOut: true,
+        closeButton: true,
+        positionClass: 'toast-center'
+      }).onHidden.subscribe(() => {
+        this.hideToast();
+      });
+    }
+  }
+
+  // Método para ocultar el toast y limpiar cualquier mensaje
+  hideToast(): void {
+    const toastElement = document.querySelector('.toast-center');
+    if (toastElement) {
+      toastElement.classList.add('hide');
+    }
+    this.toastr.clear(); // Limpiar cualquier toast existente
   }
 
   // Método para manejar el inicio de sesión
@@ -52,7 +88,7 @@ export class LoginComponent {
       },
       error: (error) => {
         console.error('Error al iniciar sesión:', error);
-        alert('Error al iniciar sesión, por favor verifica tus credenciales.');
+        this.showToast('por favor verifica tus credenciales.','Error al iniciar sesion','error')
         this.errorMessage = 'Error al iniciar sesión, por favor verifica tus credenciales.';
       }
     });

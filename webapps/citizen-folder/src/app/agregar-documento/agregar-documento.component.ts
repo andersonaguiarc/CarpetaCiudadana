@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-agregar-documento',
@@ -14,10 +15,44 @@ export class AgregarDocumentoComponent {
   fileSlug: string = '';
   isFileLoaded: boolean = false;  // Indicador de que el archivo fue cargado
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router,   private toastr: ToastrService) { }
   
   ngOnInit(): void {
     this.verifyToken(); // Verificar el token antes de cargar los documentos
+  }
+
+  showToast(message: string, title: string, type: 'success' | 'error'): void {
+    const toastElement = document.querySelector('.toast-center');
+    if (toastElement) {
+      toastElement.classList.remove('hide'); // Muestra el toast
+    }
+
+    if (type === 'success') {
+      this.toastr.success(message, title, {
+        disableTimeOut: true,
+        closeButton: true,
+        positionClass: 'toast-center'
+      }).onHidden.subscribe(() => {
+        this.hideToast();
+      });
+    } else if (type === 'error') {
+      this.toastr.error(message, title, {
+        disableTimeOut: true,
+        closeButton: true,
+        positionClass: 'toast-center'
+      }).onHidden.subscribe(() => {
+        this.hideToast();
+      });
+    }
+  }
+
+  // Método para ocultar el toast y limpiar cualquier mensaje
+  hideToast(): void {
+    const toastElement = document.querySelector('.toast-center');
+    if (toastElement) {
+      toastElement.classList.add('hide');
+    }
+    this.toastr.clear(); // Limpiar cualquier toast existente
   }
 
   verifyToken(): void {
@@ -42,6 +77,7 @@ export class AgregarDocumentoComponent {
       this.fileSlug = this.generateSlug(this.selectedFile.name);
       this.isFileLoaded = true; // Activar el indicador
     } else {
+      this.showToast('No se ha seleccionado ningún archivo.','Seleccione un archivo','error')
       console.error('No se ha seleccionado ningún archivo.');
     }
   }
@@ -81,7 +117,7 @@ export class AgregarDocumentoComponent {
         .subscribe(
           (response) => {
             console.log('Archivo subido exitosamente:', response);
-            alert('Documento agregado con éxito'); // Mostrar alerta
+            this.showToast('Documento agregado con éxito','Exito','success')
             this.resetUploadArea(); // Limpiar la zona de arrastre
           },
           (error) => {

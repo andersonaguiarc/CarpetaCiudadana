@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http'; // Importamos HttpClient para
 import { Router } from '@angular/router';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-certificar',
@@ -16,11 +17,45 @@ export class CertificarComponent implements OnInit {
   selectedDocument: any = null; // Documento seleccionado
   apiUrl: string = 'https://api.fastidentify.com/documents/api/documents'; // API para listar documentos
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient, private router: Router, private toastr: ToastrService) { }
 
   ngOnInit(): void {
     this.verifyToken(); // Verificar el token antes de cargar los documentos
     this.loadDocuments(); // Cargar la lista de documentos al iniciar
+  }
+
+  showToast(message: string, title: string, type: 'success' | 'error'): void {
+    const toastElement = document.querySelector('.toast-center');
+    if (toastElement) {
+      toastElement.classList.remove('hide'); // Muestra el toast
+    }
+
+    if (type === 'success') {
+      this.toastr.success(message, title, {
+        disableTimeOut: true,
+        closeButton: true,
+        positionClass: 'toast-center'
+      }).onHidden.subscribe(() => {
+        this.hideToast();
+      });
+    } else if (type === 'error') {
+      this.toastr.error(message, title, {
+        disableTimeOut: true,
+        closeButton: true,
+        positionClass: 'toast-center'
+      }).onHidden.subscribe(() => {
+        this.hideToast();
+      });
+    }
+  }
+
+  // Método para ocultar el toast y limpiar cualquier mensaje
+  hideToast(): void {
+    const toastElement = document.querySelector('.toast-center');
+    if (toastElement) {
+      toastElement.classList.add('hide');
+    }
+    this.toastr.clear(); // Limpiar cualquier toast existente
   }
 
   verifyToken(): void {
@@ -109,12 +144,12 @@ export class CertificarComponent implements OnInit {
       }).subscribe({
         next: (response) => {
           console.log('Documento certificado exitosamente:', response);
-          alert('El documento ha sido certificado exitosamente.');
+          this.showToast('El documento ha sido certificado exitosamente.','Exito','success');
           this.loadDocuments();
         },
         error: (error) => {
           console.error('Error al certificar el documento:', error);
-          alert('Hubo un error al certificar el documento. Inténtalo nuevamente.');
+          this.showToast('Hubo un error al certificar el documento. Inténtalo nuevamente.','Error','error');
         }
       });
     } else {

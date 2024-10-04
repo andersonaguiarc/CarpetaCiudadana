@@ -1,5 +1,6 @@
 <div class="login">
     <div class="form-container">
+        
         <div class="razon">
             <img src="../../assets/carpeta.png" alt="logo" class="logo">
             <br>
@@ -25,7 +26,7 @@
             <label for="password" class="label">Contraseña</label>
             <input type="password" id="password" formControlName="password" placeholder="********" class="input input-password">
             <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error-message">
-                La contraseña debe tener al menos 6 caracteres.
+                La contraseña debe de tener al menos una mayuscula, un caracter especial y minimo 8 caracteres
             </div>
 
             <label for="password_confirm" class="label">Confirmar Contraseña</label>
