@@ -43,7 +43,6 @@ class Handler:
 
     @circuit(failure_threshold=2)
     def certify(self, response, user_id, file_name, email_body):
-        raise Exception("Circuit Breaker")
         govcarpeta_response = requests.put(
             f"{self.govcarpeta_url}/apis/authenticateDocument",
             json={
