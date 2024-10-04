@@ -30,7 +30,7 @@ def create_amqp_connection():
             host=amqp_host,
             credentials=credentials,
             port=amqp_port,
-            # heartbeat=0,
+            heartbeat=0,
         )
     )
     return connection
