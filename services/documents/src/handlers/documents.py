@@ -43,6 +43,7 @@ class Handler:
 
     @circuit(failure_threshold=2)
     def certify(self, response, user_id, file_name, email_body):
+        raise Exception("Circuit Breaker")
         govcarpeta_response = requests.put(
             f"{self.govcarpeta_url}/apis/authenticateDocument",
             json={
@@ -64,7 +65,7 @@ class Handler:
         self.amqp_channel.basic_publish(
             exchange=self.queue_to_certify_email,
             routing_key=self.queue_to_certify_email,
-            body=email_body,
+            body=json.dumps(email_body),
         )
 
     @token_required
@@ -166,11 +167,13 @@ class Handler:
             self.amqp_channel.basic_publish(
                 exchange=self.queue_to_certify_email,
                 routing_key=self.queue_to_certify_email,
-                body={
-                    "email": certification_request.email,
-                    "subject": "Document Certification",
-                    "message": f"Document '{certification_request.documentTitle}' certified successfully",
-                },
+                body=json.dumps(
+                    {
+                        "email": certification_request.email,
+                        "subject": "Document Certification",
+                        "message": f"Document '{certification_request.documentTitle}' certified successfully",
+                    }
+                ),
             )
             return jsonify({"message": "document certification successful"}), 200
         except Exception as err:
