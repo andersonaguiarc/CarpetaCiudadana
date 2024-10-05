@@ -371,7 +371,10 @@ class RegisterTransferedCitizen(Resource):
         message_documents = register_transfered_document
         message_third = {"id": register_transfered_citizen['id']}
 
-        message_documents['Documents'] = message_documents.pop('documents')
+        if 'Documents' in message_documents:
+            message_documents['Documents'] = message_documents.pop('documents')
+        else:
+            message_documents['Documents'] = {}
 
         # Registro de nuevo ciudadano a Citizen
         register_citizen_url = Config.REGISTER_CITIZEN_API_URL

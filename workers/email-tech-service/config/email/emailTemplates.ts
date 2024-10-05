@@ -56,7 +56,7 @@ const generateEmailHtml = (message: any): string => {
             <h1>Notification</h1>
           </div>
           <div class="content">
-            ${message.message}
+            ${message}
           </div>
           <div class="footer">
             &copy; ${new Date().getFullYear()} FastIdentify. All rights reserved.
