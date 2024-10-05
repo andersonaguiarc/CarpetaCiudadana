@@ -10,6 +10,7 @@ data:
   PORT: "8400"
   FILES_URL: http://files-api
   DOCUMENTS_URL: http://documents-api
+  #GOVCARPETA_URL: https://govcarpeta-apis.herokuapp.com
   GOVCARPETA_URL: https://govcarpeta-apis-83e1c996379d.herokuapp.com
   AMQP_QUEUE: document_to_certificate
   AMQP_EXCHANGE: document_to_certificate

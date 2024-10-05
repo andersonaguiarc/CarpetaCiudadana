@@ -371,7 +371,7 @@ class RegisterTransferedCitizen(Resource):
         message_documents = register_transfered_document
         message_third = {"id": register_transfered_citizen['id']}
 
-        if 'Documents' in message_documents:
+        if 'documents' in message_documents:
             message_documents['Documents'] = message_documents.pop('documents')
         else:
             message_documents['Documents'] = {}
