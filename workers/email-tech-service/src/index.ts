@@ -7,8 +7,14 @@ dotenv.config();
 
 
 const processEmailNotification = async (message) => {
-    await transporter.sendMail(CreateNotificationCitizenEmail(message));
-    transporter.close();
+    const canProcessMessage = message && message.email && message.subject && message.message;
+    if (canProcessMessage) {
+        await transporter.sendMail(CreateNotificationCitizenEmail(message));
+        transporter.close();
+    } else {
+        console.log('Invalid message:', message);
+        throw new Error('Invalid message');
+    }
 }
 
 const transporter = createTransport(mailhogConfig);
@@ -26,7 +32,7 @@ const consumeMessage = async (msg: amqp.ConsumeMessage | null) => {
             const parsedMessage = JSON.parse(messageContent);
             console.log('Received message:', parsedMessage);
             await processEmailNotification(parsedMessage);
-
+            channel.ack(msg);
         } catch (error) {
             console.log('Error in consumer:', error);
             channel.nack(msg, false, false);
